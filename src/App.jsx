@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import AdminDashboard from './pages/AdminDashboard';
 import EmployeeDashboard from './pages/EmployeeDashboard';
@@ -34,7 +34,7 @@ const ProtectedRoute = ({ children, roles }) => {
 
 const App = () => (
   <AuthProvider>
-    <BrowserRouter>
+    <HashRouter>
       <Suspense fallback={<LoadingSpinner />}>
         <Routes>
           {/* Public Route */}
@@ -80,7 +80,7 @@ const App = () => (
           <Route path="*" element={<Navigate to="/login" />} />
         </Routes>
       </Suspense>
-    </BrowserRouter>
+    </HashRouter>
   </AuthProvider>
 );
 
