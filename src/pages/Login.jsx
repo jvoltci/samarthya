@@ -9,19 +9,46 @@ import {
   Typography,
   Grid,
   Paper,
-  CircularProgress,
 } from '@mui/material';
 import { styled } from '@mui/system';
-import NDRF from '../assets/ndrf_logo.png'
+import NDRF from '../assets/ndrf_logo.png';
+import LoadingSpinner from '../components/shared/LoadingSpinner';
 
+// Neumorphism styles
 const StyledPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(4),
   textAlign: 'center',
-  borderRadius: theme.spacing(2),
-  boxShadow: '0px 3px 6px rgba(0,0,0,0.16)',
+  borderRadius: '20px',
+  background: '#e0e5ec',
+  boxShadow: '8px 8px 16px #b8bec6, -8px -8px 16px #ffffff',
   maxWidth: 400,
   margin: 'auto',
 }));
+
+const StyledTextField = styled(TextField)({
+  '& .MuiOutlinedInput-root': {
+    borderRadius: '12px',
+    background: '#e0e5ec',
+    boxShadow: 'inset 4px 4px 8px #b8bec6, inset -4px -4px 8px #ffffff',
+    '& fieldset': { border: 'none' },
+    '&:hover fieldset': { border: 'none' },
+    '&.Mui-focused fieldset': { border: 'none' },
+  },
+});
+
+const StyledButton = styled(Button)({
+  borderRadius: '12px',
+  background: '#e0e5ec',
+  boxShadow: '6px 6px 12px #b8bec6, -6px -6px 12px #ffffff',
+  color: '#333',
+  fontWeight: 'bold',
+  '&:hover': {
+    background: '#d1d9e6',
+  },
+  '&:active': {
+    boxShadow: 'inset 4px 4px 8px #b8bec6, inset -4px -4px 8px #ffffff',
+  },
+});
 
 const Login = () => {
   const [regimentalNo, setRegimentalNo] = useState('');
@@ -37,12 +64,13 @@ const Login = () => {
     setLoading(true);
 
     try {
-      await login({ regimentalNo, password });
-    
-      if (user && user.isAdmin) {
+      const loggedInUser = await login({ regimentalNo, password });
+      if (loggedInUser?.isAdmin) {
         navigate('/admin');
+      } else if (loggedInUser?.employeeId) {
+        navigate(`/employee/${loggedInUser.employeeId}`);
       } else {
-        navigate('/employee');
+        navigate('/admin');
       }
     } catch (err) {
       setError('Invalid credentials. Please try again.');
@@ -53,28 +81,19 @@ const Login = () => {
 
   return (
     <Container maxWidth="lg">
-      <Grid
-        container
-        alignItems="center"
-        justifyContent="center"
-        style={{ minHeight: '100vh' }}
-      >
+      <Grid container alignItems="center" justifyContent="center" style={{ minHeight: '100vh' }}>
         <Grid item xs={12} sm={8} md={6}>
-          <StyledPaper>
+          <StyledPaper elevation={0}>
             <Box textAlign="center" mb={2}>
-              <img
-                src={NDRF}
-                alt="Logo"
-                style={{ width: 100, height: 100, objectFit: 'contain' }}
-              />
-              <Typography variant="h5" component="h1">
+              <img src={NDRF} alt="Logo" style={{ width: 100, height: 100, objectFit: 'contain' }} />
+              <Typography variant="h5" component="h1" sx={{ color: '#333', fontWeight: 'bold' }}>
                 Samarthya
               </Typography>
             </Box>
             <form onSubmit={handleSubmit}>
               <Grid container spacing={2}>
                 <Grid item xs={12}>
-                  <TextField
+                  <StyledTextField
                     label="Regimental No"
                     variant="outlined"
                     fullWidth
@@ -84,7 +103,7 @@ const Login = () => {
                   />
                 </Grid>
                 <Grid item xs={12}>
-                  <TextField
+                  <StyledTextField
                     label="Password"
                     type="password"
                     variant="outlined"
@@ -102,15 +121,9 @@ const Login = () => {
                   </Grid>
                 )}
                 <Grid item xs={12}>
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    color="primary"
-                    fullWidth
-                    disabled={loading}
-                  >
-                    {loading ? <CircularProgress size={24} /> : 'Login'}
-                  </Button>
+                  <StyledButton type="submit" variant="contained" fullWidth disabled={loading}>
+                    {loading ? <LoadingSpinner size={24} /> : 'Login'}
+                  </StyledButton>
                 </Grid>
               </Grid>
             </form>

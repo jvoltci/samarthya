@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Grid, Typography, CircularProgress, Alert, Paper, List, ListItem, ListItemText } from '@mui/material';
+import { Grid, Typography, Alert, Paper, List, ListItem, ListItemText } from '@mui/material';
 import axios from '../../../services/api';
+import LoadingSpinner from '../../../components/shared/LoadingSpinner';
 
 const AdminAttendance = () => {
   const [attendance, setAttendance] = useState([]);
@@ -30,7 +31,7 @@ const AdminAttendance = () => {
       </Grid>
       <Grid item xs={12}>
         {loading ? (
-          <CircularProgress />
+          <LoadingSpinner />
         ) : error ? (
           <Alert severity="error">{error}</Alert>
         ) : (

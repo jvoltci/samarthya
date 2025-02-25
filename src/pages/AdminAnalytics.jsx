@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Grid, Typography, CircularProgress, Card, CardContent } from '@mui/material';
+import { Grid, Typography, Card, CardContent } from '@mui/material';
 import { Bar } from 'react-chartjs-2';
 import axios from '../services/api';
+import LoadingSpinner from '../components/shared/LoadingSpinner';
 
 const AdminAnalytics = () => {
   const [analyticsData, setAnalyticsData] = useState(null);
@@ -28,7 +29,7 @@ const AdminAnalytics = () => {
         <Typography variant="h4">Admin Analytics</Typography>
       </Grid>
       {loading ? (
-        <CircularProgress />
+        <LoadingSpinner />
       ) : (
         analyticsData && (
           <>

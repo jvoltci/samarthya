@@ -8,7 +8,6 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableContainer,
   TableHead,
   TableRow,
   Dialog,
@@ -17,7 +16,6 @@ import {
   DialogActions,
   TextField,
   IconButton,
-  CircularProgress,
   MenuItem,
   FormControl,
   InputLabel,
@@ -29,6 +27,9 @@ import { useForm, Controller } from 'react-hook-form';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import AsyncSelect from "react-select/async";
+import LoadingSpinner from '../../../components/shared/LoadingSpinner';
+import { neumorphismStyles } from '../Employee/Style';
+import { ResponsiveTable } from '../../../components/shared/ResponsiveTable';
 
 const AdminLeave = () => {
   const [leaveRecords, setLeaveRecords] = useState([]);
@@ -38,7 +39,7 @@ const AdminLeave = () => {
   const [editMode, setEditMode] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [expandedRow, setExpandedRow] = useState(null);  // Track which row is expanded
-  const { handleSubmit, control, reset } = useForm();
+  const { handleSubmit, control, reset, setValue } = useForm();
 
   const theme = useTheme();
   const isLargeScreen = useMediaQuery(theme.breakpoints.up('lg'));
@@ -46,6 +47,16 @@ const AdminLeave = () => {
   useEffect(() => {
     fetchLeaveRecords();
   }, []);
+
+  useEffect(() => {
+    if (selectedRecord && editMode) {
+      setValue("leaveType", selectedRecord?.leaveType);
+      setValue("startDate", selectedRecord?.startDate.split('T')[0]);
+      setValue("endDate", selectedRecord?.endDate.split('T')[0]);
+      setValue("resson", selectedRecord?.reason);
+      setValue("status", selectedRecord?.status);
+    }
+  }, [selectedRecord, editMode, setValue]);
 
   const fetchLeaveRecords = async () => {
     setLoading(true);
@@ -120,12 +131,12 @@ const AdminLeave = () => {
   };
 
   return (
-    <Box sx={{ p: 2 }}>
+    <Box sx={neumorphismStyles.container2}>
       <Grid container justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
         <Typography variant="h4">Leaves</Typography>
-        <Button
-          variant="contained"
+        <Button sx={neumorphismStyles.button2}
           color="primary"
+          variant='outlined'
           startIcon={<Add />}
           onClick={() => handleOpen()}
         >
@@ -134,18 +145,18 @@ const AdminLeave = () => {
       </Grid>
 
       {loading ? (
-        <CircularProgress />
+        <LoadingSpinner />
       ) : (
-        <TableContainer component={Paper}>
+        <ResponsiveTable component={Paper}>
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>Employee</TableCell>
-                {isLargeScreen && <TableCell>Leave Type</TableCell>}
-                <TableCell>Start Date</TableCell>
-                {isLargeScreen && <TableCell>End Date</TableCell>}
-                {isLargeScreen && <TableCell>Status</TableCell>}
-                <TableCell align="right">Actions</TableCell>
+                <TableCell sx={neumorphismStyles.cell} >Employee</TableCell>
+                {isLargeScreen && <TableCell sx={neumorphismStyles.cell} >Leave Type</TableCell>}
+                <TableCell sx={neumorphismStyles.cell} >Start Date</TableCell>
+                {isLargeScreen && <TableCell sx={neumorphismStyles.cell} >End Date</TableCell>}
+                {isLargeScreen && <TableCell sx={neumorphismStyles.cell} >Status</TableCell>}
+                <TableCell sx={neumorphismStyles.cell}  align="right">Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -153,13 +164,13 @@ const AdminLeave = () => {
                 <React.Fragment key={record._id}>
                   {/* Main Row */}
                   <TableRow>
-                    <TableCell>{record.employee?.name}</TableCell>
-                    {isLargeScreen && <TableCell>{record.leaveType}</TableCell>}
-                    <TableCell>{new Date(record.startDate).toLocaleDateString()}</TableCell>
-                    {isLargeScreen && <TableCell>{new Date(record.endDate).toLocaleDateString()}</TableCell>}
-                    {isLargeScreen && <TableCell>{record.status}</TableCell>}
-                    <TableCell align="right">
-                      <IconButton color="primary" onClick={() => toggleRowExpansion(record._id)}>
+                    <TableCell sx={neumorphismStyles.cell} >{record.employee?.name}</TableCell>
+                    {isLargeScreen && <TableCell sx={neumorphismStyles.cell} >{record.leaveType}</TableCell>}
+                    <TableCell sx={neumorphismStyles.cell} >{new Date(record.startDate).toLocaleDateString()}</TableCell>
+                    {isLargeScreen && <TableCell sx={neumorphismStyles.cell} >{new Date(record.endDate).toLocaleDateString()}</TableCell>}
+                    {isLargeScreen && <TableCell sx={neumorphismStyles.cell} >{record.status}</TableCell>}
+                    <TableCell sx={neumorphismStyles.cell}  align="right">
+                      <IconButton sx={neumorphismStyles.button} color="primary" onClick={() => toggleRowExpansion(record._id)}>
                         <Visibility />
                       </IconButton>
                     </TableCell>
@@ -168,7 +179,7 @@ const AdminLeave = () => {
                   {/* Expanded Row */}
                   {expandedRow === record._id && (
                     <TableRow>
-                      <TableCell colSpan={6} sx={{ backgroundColor: '#f9f9f9' }}>
+                      <TableCell sx={neumorphismStyles.cell}  colSpan={6} >
                         <Box sx={{ p: 2 }}>
                           <Typography variant="body2">
                             <strong>Name:</strong> {record.employee?.name}
@@ -189,17 +200,15 @@ const AdminLeave = () => {
                             <strong>Status:</strong> {record.status}
                           </Typography>
                           <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
-                            <Button
-                              variant="contained"
-                              color="primary"
+                            <Button sx={neumorphismStyles.button}
+                              color="secondary"
                               startIcon={<Edit />}
                               onClick={() => handleOpen(record)}
                             >
                               Edit
                             </Button>
-                            <Button
-                              variant="contained"
-                              color="secondary"
+                            <Button sx={neumorphismStyles.button}
+                              color='error'
                               startIcon={<Delete />}
                               onClick={() => handleDeleteLeaveRecord(record._id)}
                             >
@@ -214,7 +223,7 @@ const AdminLeave = () => {
               ))}
             </TableBody>
           </Table>
-        </TableContainer>
+        </ResponsiveTable>
       )}
 
       {/* Modal for Add/Edit */}
@@ -319,10 +328,10 @@ const AdminLeave = () => {
               )}
             />
             <DialogActions>
-              <Button onClick={handleClose} color="secondary">
+              <Button sx={neumorphismStyles.button} onClick={handleClose} color="secondary">
                 Cancel
               </Button>
-              <Button type="submit" color="primary">
+              <Button sx={neumorphismStyles.button} type="submit" color="primary">
                 Save
               </Button>
             </DialogActions>

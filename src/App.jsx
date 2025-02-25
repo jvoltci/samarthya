@@ -14,6 +14,7 @@ import AdminCourse from './pages/Admin/Course/AdminCourse';
 import AdminBMI from './pages/Admin/BMI/AdminBMI';
 import AdminMedical from './pages/Admin/Medical/AdminMedical';
 import AdminLeave from './pages/Admin/Leave/AdminLeave';
+import AdminUserManagement from './pages/Admin/UserManagement/AdminUserManagement';
 
 const ProtectedRoute = ({ children, roles }) => {
   const { user, loading } = useAuth();
@@ -55,6 +56,7 @@ const App = () => (
                     <Route path="medical" element={<AdminMedical />} />
                     <Route path="attendance" element={<AdminAttendance />} />
                     <Route path="equipment" element={<AdminEquipment />} />
+                    <Route path="user" element={<AdminUserManagement />} />
                   </Routes>
                 </Layout>
               </ProtectedRoute>
@@ -68,7 +70,7 @@ const App = () => (
             element={
               <ProtectedRoute roles={['employee']}>
                 <Layout>
-                  <EmployeeDashboard />
+                  <AdminEmployeeProfile />
                 </Layout>
               </ProtectedRoute>
             }

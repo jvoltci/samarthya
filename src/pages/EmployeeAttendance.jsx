@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Grid, Typography, CircularProgress } from '@mui/material';
+import { Button, Grid, Typography } from '@mui/material';
 import axios from '../services/api';
+import LoadingSpinner from '../components/shared/LoadingSpinner';
 
 const EmployeeAttendance = () => {
   const [attendance, setAttendance] = useState(null);
@@ -60,7 +61,7 @@ const EmployeeAttendance = () => {
       </Grid>
       <Grid item xs={12}>
         {loading ? (
-          <CircularProgress />
+          <LoadingSpinner />
         ) : (
           <>
             {attendance ? (

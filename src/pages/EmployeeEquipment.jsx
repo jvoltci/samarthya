@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Typography, Grid, CircularProgress } from '@mui/material';
+import { Typography, Grid } from '@mui/material';
 import axios from '../services/api';
+import LoadingSpinner from '../components/shared/LoadingSpinner';
 
 const EmployeeEquipment = () => {
   const [assignedEquipment, setAssignedEquipment] = useState([]);
@@ -28,7 +29,7 @@ const EmployeeEquipment = () => {
       </Grid>
       <Grid item xs={12}>
         {loading ? (
-          <CircularProgress />
+          <LoadingSpinner />
         ) : (
           assignedEquipment.map((equipment) => (
             <Grid container spacing={2} key={equipment._id} style={{ marginBottom: '16px' }}>

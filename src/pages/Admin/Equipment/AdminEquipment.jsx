@@ -17,7 +17,6 @@ import {
   DialogActions,
   TextField,
   IconButton,
-  CircularProgress,
   FormControl,
   InputLabel,
   Select,
@@ -32,13 +31,9 @@ import AsyncSelect from "react-select/async";
 import { styled } from '@mui/system';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
-
-// Styled components for responsive layouts
-const ResponsiveTable = styled(TableContainer)(({ theme }) => ({
-  [theme.breakpoints.down('md')]: {
-    overflowX: 'auto',
-  },
-}));
+import LoadingSpinner from '../../../components/shared/LoadingSpinner';
+import { neumorphismStyles } from '../Employee/Style';
+import { ResponsiveTable } from '../../../components/shared/ResponsiveTable';
 
 const AdminEquipment = () => {
   const [equipment, setEquipment] = useState([]);
@@ -69,7 +64,6 @@ const AdminEquipment = () => {
       setValue('manufacturer', selectedRecord.manufacturer);
       setValue('warrantyPeriod', selectedRecord.warrantyPeriod);
       setValue('lastServiced', selectedRecord.purchaseDate.split('T')[0]);
-      setValue('assignedTo', selectedRecord.assignedTo._id);
       setValue('status', selectedRecord.status);
     }
   }, [selectedRecord, editMode, setValue]);
@@ -136,18 +130,6 @@ const AdminEquipment = () => {
     }
   };
 
-  // Handle deleting equipment record
-  const handleDeleteEquipment = async (id) => {
-    if (window.confirm('Are you sure you want to delete this equipment?')) {
-      try {
-        await axios.delete(`/equipment/${id}`);
-        fetchEquipment();
-      } catch (error) {
-        console.error('Failed to delete equipment:', error);
-      }
-    }
-  };
-
   // Open modal for adding/editing equipment
   const handleOpen = (record = null) => {
     setEditMode(!!record);
@@ -162,7 +144,6 @@ const AdminEquipment = () => {
       manufacturer: '',
       warrantyPeriod: '',
       lastServiced: '',
-      assignedTo: '',
       status: 'In Use',
     });
     setOpen(true);
@@ -176,15 +157,14 @@ const AdminEquipment = () => {
   };
 
   const toggleRowExpansion = (id) => {
-    setExpandedRow(expandedRow === id ? null : id); // Toggle row expansion
+    setExpandedRow(expandedRow === id ? null : id);
   };
-
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={neumorphismStyles.container2}>
       <Grid container justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
         <Typography variant="h4">Equipment</Typography>
-        <Button
-          variant="contained"
+        <Button sx={neumorphismStyles.button2}
+          variant="outlined"
           color="primary"
           startIcon={<Add />}
           onClick={() => handleOpen()}
@@ -194,26 +174,26 @@ const AdminEquipment = () => {
       </Grid>
 
       {loading ? (
-        <CircularProgress />
+        <LoadingSpinner />
       ) : (
         <ResponsiveTable>
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>Name</TableCell>
-                <TableCell>Category</TableCell>
-                {isLargeScreen && <TableCell>Status</TableCell>}
-                <TableCell align="right">Actions</TableCell>
+                <TableCell sx={neumorphismStyles.cell}>Name</TableCell>
+                <TableCell sx={neumorphismStyles.cell}>Category</TableCell>
+                {isLargeScreen && <TableCell sx={neumorphismStyles.cell}>Status</TableCell>}
+                <TableCell sx={neumorphismStyles.cell} align="right">Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {equipment.map((record) => (
                 <React.Fragment key={record._id}>
                   <TableRow >
-                    <TableCell>{record.name}</TableCell>
-                    <TableCell>{record.category.name}</TableCell>
-                    {isLargeScreen && <TableCell>{record.status}</TableCell>}
-                    <TableCell align="right">
+                    <TableCell sx={neumorphismStyles.cell}>{record.name}</TableCell>
+                    <TableCell sx={neumorphismStyles.cell}>{record.category.name}</TableCell>
+                    {isLargeScreen && <TableCell sx={neumorphismStyles.cell}>{record.status}</TableCell>}
+                    <TableCell sx={neumorphismStyles.cell} align="right">
                       <IconButton
                         color="primary"
                         onClick={() => toggleRowExpansion(record._id)}
@@ -225,7 +205,7 @@ const AdminEquipment = () => {
                   {/* Expanded Row */}
                   {expandedRow === record._id && (
                     <TableRow>
-                      <TableCell colSpan={isLargeScreen ? 5 : 3} sx={{ backgroundColor: '#f9f9f9' }}>
+                      <TableCell sx={neumorphismStyles.cell} colSpan={isLargeScreen ? 5 : 3}>
                         <Box sx={{ p: 2 }}>
                           <Typography variant="body2">
                             <strong>Name:</strong> {record.name}
@@ -235,9 +215,6 @@ const AdminEquipment = () => {
                           </Typography>
                           <Typography variant="body2">
                             <strong>Category:</strong> {record.category?.name}
-                          </Typography>
-                          <Typography variant="body2">
-                            <strong>Assigned To:</strong> {record.category?.assignedTo}
                           </Typography>
                           {record.status && <Typography variant="body2">
                             <strong>Status:</strong> {record.status}
@@ -261,16 +238,14 @@ const AdminEquipment = () => {
                             <strong>Last Serviced:</strong> {new Date(record.lastServiced).toLocaleDateString()}
                           </Typography>}
                           <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
-                            <Button
-                              variant="contained"
+                            <Button sx={neumorphismStyles.button}
                               color="primary"
                               startIcon={<Edit />}
                               onClick={() => handleOpen(record)}
                             >
                               Edit
                             </Button>
-                            <Button
-                              variant="contained"
+                            <Button sx={neumorphismStyles.button}
                               color="secondary"
                               startIcon={<Delete />}
                               onClick={() => handleDeleteMedicalRecord(record._id)}
@@ -389,32 +364,6 @@ const AdminEquipment = () => {
                 <TextField {...field} label="Last Serviced" fullWidth margin="normal" type="date" InputLabelProps={{ shrink: true }} />
               )}
             />
-            <FormControl fullWidth margin="normal">
-              <InputLabel shrink>Assigned To</InputLabel>
-              <Controller
-                name="assignedTo"
-                control={control}
-                render={({ field, fieldState }) => (
-                  <AsyncSelect
-                    {...field}
-                    cacheOptions
-                    loadOptions={fetchEmployees}
-                    defaultOptions
-                    placeholder="Search Name or Regimental No"
-                    styles={{ menu: (base) => ({ ...base, zIndex: 9999 }) }}
-                    value={
-                      editMode && selectedRecord && selectedRecord.assignedTo
-                        ? {
-                          label: `${selectedRecord.assignedTo.name} (${selectedRecord.assignedTo.regimentalNo})`,
-                          value: selectedRecord.assignedTo._id,
-                        }
-                        : null
-                    }
-                    onChange={(newValue) => field.onChange(newValue ? newValue.value : null)}
-                  />
-                )}
-              />
-            </FormControl>
 
             <Controller
               name="status"
@@ -434,10 +383,10 @@ const AdminEquipment = () => {
             />
 
             <DialogActions>
-              <Button onClick={handleClose} color="secondary">
+              <Button sx={neumorphismStyles.button} onClick={handleClose} color="secondary">
                 Cancel
               </Button>
-              <Button type="submit" color="primary">
+              <Button sx={neumorphismStyles.button} type="submit" color="success">
                 Save
               </Button>
             </DialogActions>

@@ -1,37 +1,73 @@
-import React, { useState, useEffect } from 'react';
-import { Grid, Typography, Button, CircularProgress, Alert, Paper, TextField } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
-import axios from '../../../services/api';
-import EmployeeList from './components/EmployeeList';
-import EmployeeForm from './components/EmployeeForm';
-import Sidebar from '../../../components/shared/Sidebar';
+import React, { useState, useEffect } from "react";
+import {
+  Grid,
+  Typography,
+  Alert,
+  Paper,
+  TextField,
+  MenuItem,
+} from "@mui/material";
+import axios from "../../../services/api";
+import EmployeeList from "./components/EmployeeList";
+import Sidebar from "../../../components/shared/Sidebar";
+import { neumorphismStyles } from "./Style";
+import LoadingSpinner from "../../../components/shared/LoadingSpinner";
 
 export const initialFormData = {
-  name: '', phone: '', dob: '', role: '', regimentalNo: '', rank: '', doj: ''
-}
+  name: "",
+  phone: "",
+  dob: "",
+  role: "",
+  regimentalNo: "",
+  rank: "",
+  doj: "",
+};
 
 const AdminEmployee = () => {
   const [employees, setEmployees] = useState([]);
+  const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [formData, setFormData] = useState(initialFormData);
   const [openDialog, setOpenDialog] = useState(false);
-  const [isEditMode, setIsEditMode] = useState(false); // Flag to track if it's edit mode
+  const [isEditMode, setIsEditMode] = useState(false);
+
+  // Filters
+  const [filters, setFilters] = useState({
+    on_leave: "",
+    course: "",
+    start_date: "",
+    end_date: "",
+  });
 
   useEffect(() => {
     fetchEmployees();
-  }, []);
+    fetchCourses();
+  }, [filters]);
 
   const fetchEmployees = async () => {
     setLoading(true);
     try {
-      const { data } = await axios.get('/employee');
+      const { data } = await axios.get("/employee", { params: filters });
       setEmployees(data);
     } catch (err) {
-      setError('Failed to load employee data.');
+      setError("Failed to load employee data.");
     } finally {
       setLoading(false);
     }
+  };
+
+  const fetchCourses = async () => {
+    try {
+      const { data } = await axios.get("/course");
+      setCourses(data);
+    } catch (err) {
+      console.error("Error fetching courses:", err);
+    }
+  };
+
+  const handleFilterChange = (key, value) => {
+    setFilters((prev) => ({ ...prev, [key]: value }));
   };
 
   const handleEmployeeSubmit = async () => {
@@ -39,68 +75,125 @@ const AdminEmployee = () => {
     try {
       const password = Math.floor(100000 + Math.random() * 900000).toString();
       if (isEditMode) {
-        await axios.put(`/employee/${formData._id}`, { ...formData }); // Update employee
+        await axios.put(`/employee/${formData._id}`, { ...formData });
       } else {
-        await axios.post('/employee', { ...formData, password }); // Create employee
+        await axios.post("/employee", { ...formData, password });
       }
       fetchEmployees();
       resetForm();
       setOpenDialog(false);
     } catch (err) {
-      setError('Error creating/updating employee. Please try again.');
+      setError("Error creating/updating employee. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
   const resetForm = () => {
-    setFormData({
-      name: '', phone: '', dob: '', role: '', regimentalNo: '', rank: '', doj: ''
-    });
+    setFormData(initialFormData);
     setIsEditMode(false);
   };
 
   const handleEdit = (employee) => {
-    setFormData(employee); 
+    setFormData(employee);
     setIsEditMode(true);
     setOpenDialog(true);
   };
 
   return (
     <div>
-      <Sidebar role={'admin'} />
-      <Grid container spacing={2} padding={4}>
+      <Sidebar role={"admin"} />
+      <Grid container sx={neumorphismStyles.container}>
         <Grid item xs={12}>
-          <Typography variant="h4">Employees</Typography>
-        </Grid>
-        <Grid item xs={12}>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => setOpenDialog(true)}
-            startIcon={<AddIcon />}
-            sx={{ mb: 2 }}
-          >
-            Add Employee
-          </Button>
+          <Typography variant="h4" sx={neumorphismStyles.typography}>
+            Employees
+          </Typography>
         </Grid>
 
+        {/* Filters */}
+        <Grid container spacing={2} sx={{ marginBottom: 2 }}>
+          <Grid item xs={12} md={2.5}>
+            <TextField
+              select
+              fullWidth
+              label="Leave Status"
+              value={filters.on_leave}
+              onChange={(e) => handleFilterChange("on_leave", e.target.value)}
+              sx={neumorphismStyles.input}
+            >
+              <MenuItem value="">None</MenuItem>
+              <MenuItem value="true">On Leave</MenuItem>
+              <MenuItem value="false">Not On Leave</MenuItem>
+            </TextField>
+          </Grid>
+
+          <Grid item xs={12} md={2}>
+            <TextField
+              fullWidth
+              label="Start Date"
+              type="date"
+              InputLabelProps={{ shrink: true }}
+              value={filters.start_date}
+              onChange={(e) =>
+                handleFilterChange("start_date", e.target.value)
+              }
+              sx={neumorphismStyles.input}
+            />
+          </Grid>
+
+          <Grid item xs={12} md={2}>
+            <TextField
+              fullWidth
+              label="End Date"
+              type="date"
+              InputLabelProps={{ shrink: true }}
+              value={filters.end_date}
+              onChange={(e) =>
+                handleFilterChange("end_date", e.target.value)
+              }
+              sx={neumorphismStyles.input}
+            />
+          </Grid>
+
+          {/* Course Filter */}
+          <Grid item xs={12} md={2.5}>
+            <TextField
+              select
+              fullWidth
+              label="Course"
+              value={filters.course}
+              onChange={(e) => handleFilterChange("course", e.target.value)}
+              sx={neumorphismStyles.input}
+            >
+              <MenuItem value="">All Courses</MenuItem>
+              {courses.map((course) => (
+                <MenuItem key={course._id} value={course._id}>
+                  {course.name}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Grid>
+        </Grid>
+
+        {/* Employee List */}
         <Grid item xs={12}>
           {loading ? (
-            <CircularProgress />
+            <LoadingSpinner />
           ) : error ? (
-            <Alert severity="error">{error}</Alert>
+            <Alert severity="error" sx={neumorphismStyles.alert}>
+              {error}
+            </Alert>
           ) : (
-            <Paper elevation={3} sx={{ padding: 3 }}>
+            <Paper sx={neumorphismStyles.paper}>
               <EmployeeList
                 employees={employees}
-                onEdit={handleEdit}  // Pass handleEdit to the list
+                onEdit={handleEdit}
                 onDelete={async (id) => {
                   try {
-                    await axios.delete(`admin/employee/${id}`);
+                    await axios.delete(`/employee/${id}`);
                     fetchEmployees();
                   } catch (err) {
-                    setError('Failed to delete employee.');
+                    setError("Failed to delete employee.");
                   }
                 }}
               />
@@ -108,17 +201,6 @@ const AdminEmployee = () => {
           )}
         </Grid>
       </Grid>
-
-      <EmployeeForm
-        formData={formData}
-        setFormData={setFormData}
-        handleSubmit={handleEmployeeSubmit}
-        openDialog={openDialog}
-        setOpenDialog={setOpenDialog}
-        loading={loading}
-        setIsEditMode={setIsEditMode}
-        isEditMode={isEditMode}
-      />
     </div>
   );
 };

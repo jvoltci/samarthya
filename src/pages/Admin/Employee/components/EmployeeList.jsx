@@ -55,7 +55,7 @@ const EmployeeList = ({ employees, onEdit, onDelete }) => {
           >
             <ListItemText
               primary={employee.name}
-              secondary={`Regimental: ${employee.regimentalNo}, Phone: ${employee.phone}`}
+              secondary={`Regimental: ${employee.regimentalNo}${employee.phone ? ', Phone: ' + employee.phone : ''}`}
             />
             <div>
               <Tooltip title="View Details">

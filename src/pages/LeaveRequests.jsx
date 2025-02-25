@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Grid, Button, Typography, TextField, CircularProgress } from '@mui/material';
+import { Grid, Button, Typography, TextField } from '@mui/material';
 import axios from '../services/api';
+import LoadingSpinner from '../components/shared/LoadingSpinner';
 
 const LeaveRequests = () => {
   const [leaves, setLeaves] = useState([]);
@@ -63,7 +64,7 @@ const LeaveRequests = () => {
       </Grid>
       <Grid item xs={12}>
         {loading ? (
-          <CircularProgress />
+          <LoadingSpinner />
         ) : (
           leaves.map((leave, index) => (
             <Typography key={index} variant="body1">

@@ -18,7 +18,6 @@ import {
     TextField,
     IconButton,
     MenuItem,
-    CircularProgress,
 } from "@mui/material";
 import { Add, Edit, Delete, Visibility } from "@mui/icons-material";
 import { styled } from "@mui/system";
@@ -26,13 +25,10 @@ import axios from "../../../services/api";
 import { useForm, Controller } from "react-hook-form";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
+import LoadingSpinner from "../../../components/shared/LoadingSpinner";
+import { ResponsiveTable } from "../../../components/shared/ResponsiveTable";
+import { neumorphismStyles } from "../Employee/Style";
 
-// Styled Table for responsiveness
-const ResponsiveTable = styled(TableContainer)(({ theme }) => ({
-    [theme.breakpoints.down("md")]: {
-        overflowX: "auto",
-    },
-}));
 
 const AdminCourse = () => {
     const [courses, setCourses] = useState([]);
@@ -40,12 +36,10 @@ const AdminCourse = () => {
     const [open, setOpen] = useState(false);
     const [editMode, setEditMode] = useState(false);
     const [selectedCourse, setSelectedCourse] = useState(null);
-    const [expandedRow, setExpandedRow] = useState(null); // To track expanded rows
+    const [expandedRow, setExpandedRow] = useState(null);
     const { handleSubmit, control, reset } = useForm();
-
-    // Material-UI useTheme and useMediaQuery for responsive design
     const theme = useTheme();
-    const isLargeScreen = useMediaQuery(theme.breakpoints.up("lg")); // Check if screen is large
+    const isLargeScreen = useMediaQuery(theme.breakpoints.up("lg"));
 
     useEffect(() => {
         fetchCourses();
@@ -102,15 +96,15 @@ const AdminCourse = () => {
     };
 
     const toggleRowExpansion = (id) => {
-        setExpandedRow(expandedRow === id ? null : id); // Toggle row expansion
+        setExpandedRow(expandedRow === id ? null : id);
     };
 
     return (
-        <Box sx={{ p: 2 }}>
+        <Box sx={neumorphismStyles.container2}>
             <Grid container justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
                 <Typography variant="h4">Courses</Typography>
-                <Button
-                    variant="contained"
+                <Button sx={neumorphismStyles.button2}
+                    variant="outlined"
                     color="primary"
                     startIcon={<Add />}
                     onClick={() => handleOpen()}
@@ -120,69 +114,53 @@ const AdminCourse = () => {
             </Grid>
 
             {loading ? (
-                <CircularProgress />
+                <LoadingSpinner />
             ) : (
                 <ResponsiveTable component={Paper}>
                     <Table>
                         <TableHead>
                             <TableRow>
-                                <TableCell>Course Name</TableCell>
-                                <TableCell>Type</TableCell>
-                                {isLargeScreen && <TableCell>Description</TableCell>}
-                                {isLargeScreen && <TableCell>Duration</TableCell>}
-                                <TableCell align="right">Actions</TableCell>
+                                <TableCell sx={neumorphismStyles.cell} >Course Name</TableCell>
+                                <TableCell sx={neumorphismStyles.cell} >Type</TableCell>
+                                {isLargeScreen && <TableCell sx={neumorphismStyles.cell} >Description</TableCell>}
+                                {isLargeScreen && <TableCell sx={neumorphismStyles.cell} >Duration</TableCell>}
+                                <TableCell sx={neumorphismStyles.cell}  align="right">Actions</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
                             {courses.map((course) => (
                                 <React.Fragment key={course._id}>
-                                    {/* Main Row */}
                                     <TableRow>
-                                        <TableCell>{course.name}</TableCell>
-                                        <TableCell>{course.type}</TableCell>
-                                        {isLargeScreen && <TableCell>{course.description}</TableCell>}
-                                        {isLargeScreen && <TableCell>{course.duration}</TableCell>}
-                                        <TableCell align="right">
-                                            <IconButton
-                                                color="primary"
-                                                onClick={() => toggleRowExpansion(course._id)}
-                                            >
+                                        <TableCell sx={neumorphismStyles.cell} >{course.name}</TableCell>
+                                        <TableCell sx={neumorphismStyles.cell} >{course.type}</TableCell>
+                                        {isLargeScreen && <TableCell sx={neumorphismStyles.cell} >{course.description}</TableCell>}
+                                        {isLargeScreen && <TableCell sx={neumorphismStyles.cell} >{course.duration}</TableCell>}
+                                        <TableCell sx={neumorphismStyles.cell}  align="right">
+                                            <IconButton sx={neumorphismStyles.button} color="primary" onClick={() => toggleRowExpansion(course._id)}>
                                                 <Visibility />
                                             </IconButton>
                                         </TableCell>
                                     </TableRow>
 
-                                    {/* Expanded Row */}
                                     {expandedRow === course._id && (
                                         <TableRow>
-                                            <TableCell colSpan={isLargeScreen ? 5 : 3} sx={{ backgroundColor: "#f9f9f9" }}>
+                                            <TableCell sx={neumorphismStyles.cell}  colSpan={isLargeScreen ? 5 : 3}>
                                                 <Box sx={{ p: 2 }}>
-                                                    <Typography variant="body2">
-                                                        <strong>Name:</strong> {course.name}
-                                                    </Typography>
-                                                    <Typography variant="body2">
-                                                        <strong>Type:</strong> {course.type}
-                                                    </Typography>
-                                                    <Typography variant="body2">
-                                                        <strong>Description:</strong> {course.description}
-                                                    </Typography>
-                                                    <Typography variant="body2">
-                                                        <strong>Duration:</strong> {course.duration}
-                                                    </Typography>
+                                                    <Typography><strong>Name:</strong> {course.name}</Typography>
+                                                    <Typography><strong>Type:</strong> {course.type}</Typography>
+                                                    <Typography><strong>Description:</strong> {course.description}</Typography>
+                                                    <Typography><strong>Duration:</strong> {course.duration}</Typography>
                                                     <Box sx={{ mt: 2, display: "flex", gap: 2 }}>
-                                                        <Button
-                                                            variant="contained"
-                                                            color="primary"
+                                                        <Button sx={neumorphismStyles.button}
                                                             startIcon={<Edit />}
                                                             onClick={() => handleOpen(course)}
                                                         >
                                                             Edit
                                                         </Button>
-                                                        <Button
-                                                            variant="contained"
-                                                            color="secondary"
+                                                        <Button sx={neumorphismStyles.button}
                                                             startIcon={<Delete />}
                                                             onClick={() => handleDeleteCourse(course._id)}
+                                                            color="secondary"
                                                         >
                                                             Delete
                                                         </Button>
@@ -269,11 +247,11 @@ const AdminCourse = () => {
                     </Box>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClose} variant="outlined">
+                    <Button sx={neumorphismStyles.button} onClick={handleClose}>
                         Cancel
                     </Button>
-                    <Button onClick={handleSubmit(handleAddCourse)} variant="contained" color="primary">
-                        {editMode ? "Save Changes" : "Add"}
+                    <Button sx={neumorphismStyles.button} onClick={handleSubmit(handleAddCourse)} color="success">
+                        {editMode ? "Save" : "Add"}
                     </Button>
                 </DialogActions>
             </Dialog>

@@ -17,7 +17,6 @@ import {
   DialogActions,
   TextField,
   IconButton,
-  CircularProgress,
   MenuItem,
   FormControl,
   InputLabel,
@@ -30,23 +29,19 @@ import AsyncSelect from "react-select/async";
 import { styled } from '@mui/system';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
+import LoadingSpinner from '../../../components/shared/LoadingSpinner';
+import { ResponsiveTable } from '../../../components/shared/ResponsiveTable';
+import { neumorphismStyles } from '../Employee/Style';
 
-// Styled components for responsive layouts
-const ResponsiveTable = styled(TableContainer)(({ theme }) => ({
-  [theme.breakpoints.down('md')]: {
-    overflowX: 'auto',
-  },
-}));
 
 const AdminMedical = () => {
   const [medicalRecords, setMedicalRecords] = useState([]);
-  const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
   const { handleSubmit, control, reset, setValue } = useForm();
-  const [expandedRow, setExpandedRow] = useState(null); // To track the expanded row
+  const [expandedRow, setExpandedRow] = useState(null); 
 
   const theme = useTheme();
   const isLargeScreen = useMediaQuery(theme.breakpoints.up('lg'));
@@ -140,11 +135,11 @@ const AdminMedical = () => {
   };
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={neumorphismStyles.container2}>
       <Grid container justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
         <Typography variant="h4">Medical</Typography>
-        <Button
-          variant="contained"
+        <Button sx={neumorphismStyles.button2}
+          variant="outlined"
           color="primary"
           startIcon={<Add />}
           onClick={() => handleOpen()}
@@ -154,17 +149,17 @@ const AdminMedical = () => {
       </Grid>
 
       {loading ? (
-        <CircularProgress />
+        <LoadingSpinner />
       ) : (
         <ResponsiveTable>
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>Employee</TableCell>
-                <TableCell>Category</TableCell>
-                {isLargeScreen && <TableCell>Date</TableCell>}
-                {isLargeScreen && <TableCell>Description</TableCell>}
-                <TableCell align="right">Actions</TableCell>
+                <TableCell sx={neumorphismStyles.cell}>Employee</TableCell>
+                <TableCell sx={neumorphismStyles.cell}>Category</TableCell>
+                {isLargeScreen && <TableCell sx={neumorphismStyles.cell}>Date</TableCell>}
+                {isLargeScreen && <TableCell sx={neumorphismStyles.cell}>Description</TableCell>}
+                <TableCell sx={neumorphismStyles.cell} align="right">Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -172,13 +167,14 @@ const AdminMedical = () => {
                 <React.Fragment key={record._id}>
                   {/* Main Row */}
                   <TableRow>
-                    <TableCell>{record.employee?.name}</TableCell>
-                    <TableCell>{record.category}</TableCell>
-                    {isLargeScreen && <TableCell>{new Date(record.date).toLocaleDateString()}</TableCell>}
-                    {isLargeScreen && <TableCell>{record.description}</TableCell>}
-                    <TableCell align="right">
+                    <TableCell sx={neumorphismStyles.cell}>{record.employee?.name}</TableCell>
+                    <TableCell sx={neumorphismStyles.cell}>{record.category}</TableCell>
+                    {isLargeScreen && <TableCell sx={neumorphismStyles.cell}>{new Date(record.date).toLocaleDateString()}</TableCell>}
+                    {isLargeScreen && <TableCell sx={neumorphismStyles.cell}>{record.description}</TableCell>}
+                    <TableCell sx={neumorphismStyles.cell} align="right">
                       <IconButton
                         color="primary"
+                        sx={neumorphismStyles.button}
                         onClick={() => toggleRowExpansion(record._id)}
                       >
                         <Visibility />
@@ -189,7 +185,7 @@ const AdminMedical = () => {
                   {/* Expanded Row */}
                   {expandedRow === record._id && (
                     <TableRow>
-                      <TableCell colSpan={isLargeScreen ? 5 : 3} sx={{ backgroundColor: '#f9f9f9' }}>
+                      <TableCell sx={neumorphismStyles.cell} colSpan={isLargeScreen ? 5 : 3}>
                         <Box sx={{ p: 2 }}>
                           <Typography variant="body2">
                             <strong>Employee Details:</strong> {record.employee?.name} ({record.employee?.regimentalNo})
@@ -204,16 +200,14 @@ const AdminMedical = () => {
                             <strong>Description:</strong> {record.description}
                           </Typography>
                           <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
-                            <Button
-                              variant="contained"
+                            <Button sx={neumorphismStyles.button}
                               color="primary"
                               startIcon={<Edit />}
                               onClick={() => handleOpen(record)}
                             >
                               Edit
                             </Button>
-                            <Button
-                              variant="contained"
+                            <Button sx={neumorphismStyles.button}
                               color="secondary"
                               startIcon={<Delete />}
                               onClick={() => handleDeleteMedicalRecord(record._id)}
@@ -252,9 +246,9 @@ const AdminMedical = () => {
                   value={
                     editMode && selectedRecord
                       ? {
-                          label: `${selectedRecord?.employee.name} (${selectedRecord?.employee.regimentalNo})`,
-                          value: selectedRecord?.employee._id,
-                        }
+                        label: `${selectedRecord?.employee.name} (${selectedRecord?.employee.regimentalNo})`,
+                        value: selectedRecord?.employee._id,
+                      }
                       : null
                   }
                 />
@@ -300,10 +294,10 @@ const AdminMedical = () => {
               )}
             />
             <DialogActions>
-              <Button onClick={handleClose} color="secondary">
+              <Button sx={neumorphismStyles.button} onClick={handleClose} color="secondary">
                 Cancel
               </Button>
-              <Button type="submit" color="primary">
+              <Button sx={neumorphismStyles.button} type="submit" color="success">
                 Save
               </Button>
             </DialogActions>

@@ -4,6 +4,7 @@ import {
   Box,
   Grid,
   Button,
+  Paper,
   Table,
   TableBody,
   TableCell,
@@ -18,17 +19,22 @@ import {
   IconButton,
 } from "@mui/material";
 import { Add, Edit, Delete, Visibility } from "@mui/icons-material";
-import axios from "../../../services/api";
 import { useForm, Controller } from "react-hook-form";
-import AsyncSelect from "react-select/async";
 import { useMediaQuery, useTheme } from "@mui/material";
 import { styled } from '@mui/system';
-import LoadingSpinner from "../../../components/shared/LoadingSpinner";
-import { neumorphismStyles } from "../Employee/Style";
-import { ResponsiveTable } from "../../../components/shared/ResponsiveTable";
+import axios from "../../../../services/api";
+import { neumorphismStyles } from "../Style";
+import LoadingSpinner from "../../../../components/shared/LoadingSpinner";
+import { useAuth } from "../../../../context/AuthContext";
 
+// Styled component for responsiveness
+const ResponsiveTable = styled(TableContainer)(({ theme }) => ({
+  [theme.breakpoints.down('md')]: {
+    overflowX: 'auto',
+  },
+}));
 
-const AdminBMI = () => {
+const AdminProfileBMI = ({ employeeId }) => {
   const [bmiRecords, setBmiRecords] = useState([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
@@ -37,6 +43,7 @@ const AdminBMI = () => {
   const [expandedRow, setExpandedRow] = useState(null); // To track the expanded row
   const { handleSubmit, control, reset, watch, setValue } = useForm();
   const theme = useTheme();
+  const { user } = useAuth();
   const isLargeScreen = useMediaQuery(theme.breakpoints.up("lg")); // Check if screen is large
 
   // Fetch BMI Records
@@ -47,7 +54,7 @@ const AdminBMI = () => {
   const fetchBMIRecords = async () => {
     setLoading(true);
     try {
-      const { data } = await axios.get("/bmi");
+      const { data } = await axios.get("/bmi", { params: { employee_id: employeeId } });
       setBmiRecords(data);
     } catch (error) {
       console.error("Failed to fetch BMI records:", error);
@@ -56,26 +63,13 @@ const AdminBMI = () => {
     }
   };
 
-  // Fetch Employees for Dropdown
-  const fetchEmployees = async (search = "") => {
-    try {
-      const { data } = await axios.get("/employee/search", { params: { search } });
-      return data.map((employee) => ({
-        label: `${employee.name} (${employee.regimentalNo})`,
-        value: employee._id,
-      }));
-    } catch (error) {
-      console.error("Failed to fetch employees:", error);
-      return [];
-    }
-  };
-
   // Add or Update BMI Record
   const handleSaveRecord = async (formData) => {
     try {
+      formData = { ...formData, createdAt: new Date() }
       const payload = {
         ...formData,
-        employee: formData.employee.value,
+        employee: employeeId,
       };
       if (editMode) {
         await axios.put(`/bmi/${selectedRecord._id}`, payload);
@@ -109,7 +103,8 @@ const AdminBMI = () => {
         employee: "",
         weight: "",
         height: "",
-        bmi: ""
+        bmi: "",
+        createdAt: "",
       }
     );
     setOpen(true);
@@ -137,39 +132,41 @@ const AdminBMI = () => {
   };
 
   return (
-    <Box sx={neumorphismStyles.container2}>
+    <Box sx={{ p: 2 }}>
       <Grid container justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
         <Typography variant="h4">BMI</Typography>
-        <Button sx={neumorphismStyles.button2} variant='outlined' color="primary" startIcon={<Add />} onClick={() => handleOpen()}>
+        {!bmiRecords.length && (<Button sx={neumorphismStyles.button} startIcon={<Add />} onClick={() => handleOpen()}>
           Add BMI
-        </Button>
+        </Button>)}
       </Grid>
 
       {loading ? (
         <LoadingSpinner />
       ) : (
-        <ResponsiveTable>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell sx={neumorphismStyles.cell} >Employee</TableCell>
-                {isLargeScreen &&<TableCell sx={neumorphismStyles.cell} >Weight (kg)</TableCell>}
-                {isLargeScreen &&<TableCell sx={neumorphismStyles.cell} >Height (cm)</TableCell>}
-                <TableCell sx={neumorphismStyles.cell} >BMI</TableCell>
-                <TableCell sx={neumorphismStyles.cell}  align="right">Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {bmiRecords.map((record) => (
+        bmiRecords.length ? (
+          bmiRecords.map((record) => (<ResponsiveTable>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>BMI</TableCell>
+                  {isLargeScreen && <TableCell>Weight (kg)</TableCell>}
+                  {isLargeScreen && <TableCell>Height (cm)</TableCell>}
+                  <TableCell align="right">Actions</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
                 <React.Fragment key={record._id}>
                   {/* Main Row */}
                   <TableRow>
-                    <TableCell sx={neumorphismStyles.cell} >{`${record.employee?.name} (${record.employee?.regimentalNo})`}</TableCell>
-                    {isLargeScreen &&<TableCell sx={neumorphismStyles.cell} >{record.weight}</TableCell>}
-                    {isLargeScreen &&<TableCell sx={neumorphismStyles.cell} >{record.height}</TableCell>}
-                    <TableCell sx={neumorphismStyles.cell} >{record.bmi}</TableCell>
-                    <TableCell sx={neumorphismStyles.cell}  align="right">
-                      <IconButton sx={neumorphismStyles.button} color="primary" onClick={() => toggleRowExpansion(record._id)}>
+                    <TableCell>{record.bmi}</TableCell>
+                    {isLargeScreen && <TableCell>{record.weight}</TableCell>}
+                    {isLargeScreen && <TableCell>{record.height}</TableCell>}
+                    <TableCell align="right">
+                    <IconButton
+                        sx={neumorphismStyles.button}
+                        color="primary"
+                        onClick={() => toggleRowExpansion(record._id)}
+                      >
                         <Visibility />
                       </IconButton>
                     </TableCell>
@@ -178,11 +175,8 @@ const AdminBMI = () => {
                   {/* Expanded Row */}
                   {expandedRow === record._id && (
                     <TableRow>
-                      <TableCell sx={neumorphismStyles.cell}  colSpan={isLargeScreen ? 6 : 4}>
+                      <TableCell sx={neumorphismStyles.cell} colSpan={isLargeScreen ? 6 : 4}>
                         <Box sx={{ p: 2 }}>
-                          <Typography variant="body2">
-                            <strong>Employee Details:</strong> {record.employee?.name} ({record.employee?.regimentalNo})
-                          </Typography>
                           <Typography variant="body2">
                             <strong>Weight:</strong> {record.weight} kg
                           </Typography>
@@ -192,62 +186,47 @@ const AdminBMI = () => {
                           <Typography variant="body2">
                             <strong>BMI:</strong> {record.bmi}
                           </Typography>
-                          <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
-                            <Button sx={neumorphismStyles.button}
+                          <Typography variant="body2">
+                            <strong>Created At:</strong> {new Date(record.createdAt).toLocaleDateString()}
+                          </Typography>
+                          {user?.role === 'admin' && (<Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
+                            <Button
+                              sx={neumorphismStyles.button}
+                              variant="outlined"
                               color="primary"
                               startIcon={<Edit />}
                               onClick={() => handleOpen(record)}
                             >
                               Edit
                             </Button>
-                            <Button sx={neumorphismStyles.button}
+                            <Button
+                              sx={neumorphismStyles.button}
+                              variant="outlined"
                               color="secondary"
                               startIcon={<Delete />}
                               onClick={() => handleDeleteRecord(record._id)}
                             >
                               Delete
                             </Button>
-                          </Box>
+                          </Box>)}
                         </Box>
                       </TableCell>
                     </TableRow>
                   )}
                 </React.Fragment>
-              ))}
-            </TableBody>
-          </Table>
-        </ResponsiveTable>
+              </TableBody>
+            </Table>
+          </ResponsiveTable>))
+        ) : null
       )}
 
       {/* Modal for Add/Edit */}
-      <Dialog open={open} onClose={handleClose} fullWidth>
+      <Dialog open={open} onClose={handleClose} fullWidth >
         <DialogTitle>{editMode ? "Edit BMI Record" : "Add BMI Record"}</DialogTitle>
-        <DialogContent>
+        <DialogContent sx={neumorphismStyles.paper}>
           <Box component="form" noValidate onSubmit={handleSubmit(handleSaveRecord)} sx={{ mt: 2 }}>
             <Controller
-              name="employee"
-              control={control}
-              rules={{ required: "Employee is required" }}
-              render={({ field, fieldState }) => (
-                <AsyncSelect
-                  {...field}
-                  cacheOptions
-                  loadOptions={fetchEmployees}
-                  defaultOptions
-                  placeholder="Search Employee by Name or Regimental No"
-                  styles={{ menu: (base) => ({ ...base, zIndex: 9999 }) }}
-                  value={
-                    editMode && selectedRecord
-                      ? {
-                          label: `${selectedRecord?.employee.name} (${selectedRecord?.employee.regimentalNo})`,
-                          value: selectedRecord?.employee._id,
-                        }
-                      : null
-                  }
-                />
-              )}
-            />
-            <Controller
+              sx={neumorphismStyles.input}
               name="weight"
               control={control}
               rules={{ required: "Weight is required" }}
@@ -256,6 +235,7 @@ const AdminBMI = () => {
                   {...field}
                   label="Weight (kg)"
                   fullWidth
+                  sx={neumorphismStyles.input}
                   margin="normal"
                   type="number"
                   error={!!fieldState.error}
@@ -265,12 +245,14 @@ const AdminBMI = () => {
             />
             <Controller
               name="height"
+              sx={neumorphismStyles.input}
               control={control}
               rules={{ required: "Height is required" }}
               render={({ field, fieldState }) => (
                 <TextField
                   {...field}
                   label="Height (cm)"
+                  sx={neumorphismStyles.input}
                   fullWidth
                   margin="normal"
                   type="number"
@@ -280,12 +262,14 @@ const AdminBMI = () => {
               )}
             />
             <Controller
+
               name="bmi"
               control={control}
               render={({ field }) => (
                 <TextField
                   {...field}
                   label="BMI"
+                  sx={neumorphismStyles.input}
                   fullWidth
                   margin="normal"
                   type="number"
@@ -294,18 +278,18 @@ const AdminBMI = () => {
               )}
             />
           </Box>
+          <DialogActions>
+            <Button onClick={handleClose} variant="outlined" sx={neumorphismStyles.button}>
+              Cancel
+            </Button>
+            <Button onClick={handleSubmit(handleSaveRecord)} variant="outlined"  color="secondary" sx={neumorphismStyles.button}>
+              {editMode ? "Save Changes" : "Add"}
+            </Button>
+          </DialogActions>
         </DialogContent>
-        <DialogActions>
-          <Button sx={neumorphismStyles.button} onClick={handleClose} >
-            Cancel
-          </Button>
-          <Button sx={neumorphismStyles.button} onClick={handleSubmit(handleSaveRecord)} color="success">
-            {editMode ? "Save" : "Add"}
-          </Button>
-        </DialogActions>
       </Dialog>
     </Box>
   );
 };
 
-export default AdminBMI;
+export default AdminProfileBMI;

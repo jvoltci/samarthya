@@ -10,9 +10,9 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  CircularProgress,
 } from '@mui/material';
 import { initialFormData } from '../AdminEmployee';
+import LoadingSpinner from '../../../../components/shared/LoadingSpinner';
 
 const EmployeeForm = ({
   formData,
@@ -135,7 +135,7 @@ const EmployeeForm = ({
           color="primary"
           disabled={loading || !isFormValid()}
         >
-          {loading ? <CircularProgress size={24} /> : isEditMode ? 'Update Employee' : 'Add Employee'}
+          {loading ? <LoadingSpinner /> : isEditMode ? 'Update Employee' : 'Add Employee'}
         </Button>
       </DialogActions>
     </Dialog>
