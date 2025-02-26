@@ -1,39 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Typography,
-  Box,
-  Grid,
-  Button,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  IconButton,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Checkbox,
-  FormControlLabel,
+  Typography, Box, Grid, Button, Table, TableBody, TableCell, TableHead, TableRow, Dialog, DialogTitle, DialogContent, DialogActions, TextField, IconButton, FormControl, InputLabel, Select, MenuItem, Checkbox, FormControlLabel,
 } from '@mui/material';
 import { Add, Edit, Delete, Visibility } from '@mui/icons-material';
 import axios from '../../../services/api';
 import { useForm, Controller } from 'react-hook-form';
-import AsyncSelect from "react-select/async";
-import { styled } from '@mui/system';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import LoadingSpinner from '../../../components/shared/LoadingSpinner';
 import { neumorphismStyles } from '../Employee/Style';
 import { ResponsiveTable } from '../../../components/shared/ResponsiveTable';
+import { formatDate } from '../../../utils/common';
 
 const AdminEquipment = () => {
   const [equipment, setEquipment] = useState([]);
@@ -45,13 +22,13 @@ const AdminEquipment = () => {
   const { handleSubmit, control, reset, setValue } = useForm();
   const [expandedRow, setExpandedRow] = useState(null); // To track the expanded row
   const theme = useTheme();
+  const [statusFilter, setStatusFilter] = useState('');
   const isLargeScreen = useMediaQuery(theme.breakpoints.up('lg'));
 
-  // Fetch equipment records and categories from the API
   useEffect(() => {
     fetchEquipment();
     fetchCategories();
-  }, []);
+  }, [statusFilter]);
 
   useEffect(() => {
     if (selectedRecord && editMode) {
@@ -72,7 +49,9 @@ const AdminEquipment = () => {
   const fetchEquipment = async () => {
     setLoading(true);
     try {
-      const { data } = await axios.get('/equipment');
+      const { data } = await axios.get('/equipment', {
+        params: { status: statusFilter },
+      });
       setEquipment(data);
     } catch (error) {
       console.error('Failed to fetch equipment:', error);
@@ -91,20 +70,6 @@ const AdminEquipment = () => {
       })));
     } catch (error) {
       console.error('Failed to fetch categories:', error);
-    }
-  };
-
-  const fetchEmployees = async (search = "") => {
-    try {
-      if (!search) return;
-      const { data } = await axios.get("/employee/search", { params: { search } });
-      return data.map((employee) => ({
-        label: `${employee.name} (${employee.regimentalNo})`,
-        value: employee._id,
-      }));
-    } catch (error) {
-      console.error("Failed to fetch employees:", error);
-      return [];
     }
   };
 
@@ -161,8 +126,23 @@ const AdminEquipment = () => {
   };
   return (
     <Box sx={neumorphismStyles.container2}>
+
       <Grid container justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
         <Typography variant="h4">Equipment</Typography>
+        <FormControl sx={{ minWidth: 180, my: 1 }}>
+          <InputLabel>Status</InputLabel>
+          <Select
+            sx={neumorphismStyles.input}
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+          >
+            <MenuItem value="">All</MenuItem>
+            <MenuItem value="In Use">In Use</MenuItem>
+            <MenuItem value="Available">Available</MenuItem>
+            <MenuItem value="Under Maintenance">Under Maintenance</MenuItem>
+            <MenuItem value="Retired">Retired</MenuItem>
+          </Select>
+        </FormControl>
         <Button sx={neumorphismStyles.button2}
           variant="outlined"
           color="primary"
@@ -211,7 +191,7 @@ const AdminEquipment = () => {
                             <strong>Name:</strong> {record.name}
                           </Typography>
                           <Typography variant="body2">
-                            <strong>Purchase Date:</strong> {new Date(record.purchaseDate).toLocaleDateString()}
+                            <strong>Purchase Date:</strong> {formatDate(record.purchaseDate)}
                           </Typography>
                           <Typography variant="body2">
                             <strong>Category:</strong> {record.category?.name}
@@ -235,7 +215,7 @@ const AdminEquipment = () => {
                             <strong>Warranty Period:</strong> {record.warrantyPeriod}
                           </Typography>}
                           {record.lastServiced && <Typography variant="body2">
-                            <strong>Last Serviced:</strong> {new Date(record.lastServiced).toLocaleDateString()}
+                            <strong>Last Serviced:</strong> {formatDate(record.lastServiced)}
                           </Typography>}
                           <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
                             <Button sx={neumorphismStyles.button}

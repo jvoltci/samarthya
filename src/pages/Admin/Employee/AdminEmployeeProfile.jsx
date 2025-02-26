@@ -11,7 +11,7 @@ import {
   Select,
   MenuItem,
 } from '@mui/material';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import axios from '../../../services/api';
 import CourseDialog from './components/CourseDialog';
 import AdminProfileLeave from './components/AdminProfileLeave';
@@ -23,7 +23,7 @@ import LoadingSpinner from '../../../components/shared/LoadingSpinner';
 import { useAuth } from '../../../context/AuthContext';
 
 const AdminEmployeeProfile = () => {
-  const { id } = useParams();
+  const location = useLocation();
   const navigate = useNavigate();
   const [employee, setEmployee] = useState(null);
   const [openCourseDialog, setOpenCourseDialog] = useState(false);
@@ -34,6 +34,9 @@ const AdminEmployeeProfile = () => {
   const { user } = useAuth();
   const [validationError, setValidationError] = useState('');
 
+  const pathParts = location.pathname.split('/');
+  const id = pathParts[pathParts.length - 1];
+  
   useEffect(() => {
     fetchEmployeeDetails();
   }, [id]);

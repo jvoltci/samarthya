@@ -29,6 +29,8 @@ import { useTheme } from '@mui/material/styles';
 import axios from '../../../../services/api';
 import { neumorphismStyles } from '../Style';
 import LoadingSpinner from '../../../../components/shared/LoadingSpinner';
+import { useAuth } from '../../../../context/AuthContext';
+import { capitalizeWords, formatDate } from '../../../../utils/common';
 
 
 
@@ -40,6 +42,7 @@ const AdminProfileLeave = ({ employeeId }) => {
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [expandedRow, setExpandedRow] = useState(null);
   const { handleSubmit, control, reset, setValue } = useForm();
+  const { user } = useAuth();
 
   const theme = useTheme();
   const isLargeScreen = useMediaQuery(theme.breakpoints.up('lg'));
@@ -52,7 +55,7 @@ const AdminProfileLeave = ({ employeeId }) => {
     setLoading(true);
     try {
       const { data } = await axios.get(`/leave`, { params: { employee_id: employeeId } });
-      setLeaveRecords(data);
+      setLeaveRecords(data?.data);
     } catch (error) {
       console.error('Failed to fetch leave records:', error);
     } finally {
@@ -70,6 +73,7 @@ const AdminProfileLeave = ({ employeeId }) => {
   const handleAddLeaveRecord = async (formData) => {
     try {
       const payload = { ...formData, employee: employeeId };
+      console.log(payload)
       if (editMode) {
         await axios.put(`/leave/${selectedRecord._id}`, payload);
       } else {
@@ -137,10 +141,10 @@ const AdminProfileLeave = ({ employeeId }) => {
               {leaveRecords.map((record) => (
                 <React.Fragment key={record._id}>
                   <TableRow>
-                    <TableCell>{record.leaveType}</TableCell>
-                    <TableCell>{new Date(record.startDate).toLocaleDateString()}</TableCell>
-                    {isLargeScreen && <TableCell>{new Date(record.endDate).toLocaleDateString()}</TableCell>}
-                    {isLargeScreen && <TableCell>{record.status}</TableCell>}
+                    <TableCell><strong>{record.leaveType}</strong></TableCell>
+                    <TableCell>{formatDate(record.startDate)}</TableCell>
+                    {isLargeScreen && <TableCell>{formatDate(record.endDate)}</TableCell>}
+                    {isLargeScreen && <TableCell>{capitalizeWords(record.status)}</TableCell>}
                     <TableCell align="right">
                       <IconButton
                         sx={neumorphismStyles.button}
@@ -164,22 +168,22 @@ const AdminProfileLeave = ({ employeeId }) => {
                             <strong>Leave Reason:</strong> {record.reason}
                           </Typography>
                           <Typography variant="body2">
-                            <strong>Start Date:</strong> {new Date(record.startDate).toLocaleDateString()}
+                            <strong>Start Date:</strong> {formatDate(record.startDate)}
                           </Typography>
                           <Typography variant="body2">
-                            <strong>End Date:</strong> {new Date(record.endDate).toLocaleDateString()}
+                            <strong>End Date:</strong> {formatDate(record.endDate)}
                           </Typography>
                           <Typography variant="body2">
-                            <strong>Status:</strong> {record.status}
+                            <strong>Status:</strong> {capitalizeWords(record.status)}
                           </Typography>
-                          <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
+                          {user?.role === 'admin' && (<Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
                             <Button sx={neumorphismStyles.button} variant="outlined" color="secondary" startIcon={<Edit />} onClick={() => handleOpen(record)}>
                               Edit
                             </Button>
                             <Button sx={neumorphismStyles.button} variant="outlined" color="primary" startIcon={<Delete />} onClick={() => handleDeleteLeaveRecord(record._id)}>
                               Delete
                             </Button>
-                          </Box>
+                          </Box>)}
                         </Box>
                       </TableCell>
                     </TableRow>

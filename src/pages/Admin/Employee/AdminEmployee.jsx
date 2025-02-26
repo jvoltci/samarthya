@@ -121,7 +121,7 @@ const AdminEmployee = () => {
               onChange={(e) => handleFilterChange("on_leave", e.target.value)}
               sx={neumorphismStyles.input}
             >
-              <MenuItem value="">None</MenuItem>
+              <MenuItem value="">All</MenuItem>
               <MenuItem value="true">On Leave</MenuItem>
               <MenuItem value="false">Not On Leave</MenuItem>
             </TextField>

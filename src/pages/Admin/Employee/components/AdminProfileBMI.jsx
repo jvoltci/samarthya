@@ -26,6 +26,7 @@ import axios from "../../../../services/api";
 import { neumorphismStyles } from "../Style";
 import LoadingSpinner from "../../../../components/shared/LoadingSpinner";
 import { useAuth } from "../../../../context/AuthContext";
+import { formatDate } from "../../../../utils/common";
 
 // Styled component for responsiveness
 const ResponsiveTable = styled(TableContainer)(({ theme }) => ({
@@ -187,7 +188,7 @@ const AdminProfileBMI = ({ employeeId }) => {
                             <strong>BMI:</strong> {record.bmi}
                           </Typography>
                           <Typography variant="body2">
-                            <strong>Created At:</strong> {new Date(record.createdAt).toLocaleDateString()}
+                            <strong>Created At:</strong> {formatDate(record.createdAt)}
                           </Typography>
                           {user?.role === 'admin' && (<Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
                             <Button

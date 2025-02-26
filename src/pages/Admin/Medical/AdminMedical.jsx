@@ -32,6 +32,7 @@ import { useTheme } from '@mui/material/styles';
 import LoadingSpinner from '../../../components/shared/LoadingSpinner';
 import { ResponsiveTable } from '../../../components/shared/ResponsiveTable';
 import { neumorphismStyles } from '../Employee/Style';
+import { formatDate } from '../../../utils/common';
 
 
 const AdminMedical = () => {
@@ -169,7 +170,7 @@ const AdminMedical = () => {
                   <TableRow>
                     <TableCell sx={neumorphismStyles.cell}>{record.employee?.name}</TableCell>
                     <TableCell sx={neumorphismStyles.cell}>{record.category}</TableCell>
-                    {isLargeScreen && <TableCell sx={neumorphismStyles.cell}>{new Date(record.date).toLocaleDateString()}</TableCell>}
+                    {isLargeScreen && <TableCell sx={neumorphismStyles.cell}>{formatDate(record.date)}</TableCell>}
                     {isLargeScreen && <TableCell sx={neumorphismStyles.cell}>{record.description}</TableCell>}
                     <TableCell sx={neumorphismStyles.cell} align="right">
                       <IconButton
@@ -191,7 +192,7 @@ const AdminMedical = () => {
                             <strong>Employee Details:</strong> {record.employee?.name} ({record.employee?.regimentalNo})
                           </Typography>
                           <Typography variant="body2">
-                            <strong>Date:</strong> {new Date(record.date).toLocaleDateString()}
+                            <strong>Date:</strong> {formatDate(record.date)}
                           </Typography>
                           <Typography variant="body2">
                             <strong>Category:</strong> {record.category}

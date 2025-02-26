@@ -1,25 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Typography,
-  Box,
-  Grid,
-  Button,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  IconButton,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Select,
+  Typography, Box, Grid, Button, Paper, Table, TableBody, TableCell, TableHead, TableRow, Dialog, DialogTitle, DialogContent, DialogActions, TextField, IconButton, MenuItem, FormControl, InputLabel, Select,
 } from '@mui/material';
 import { Add, Edit, Delete, Visibility } from '@mui/icons-material';
 import axios from '../../../services/api';
@@ -30,22 +11,32 @@ import AsyncSelect from "react-select/async";
 import LoadingSpinner from '../../../components/shared/LoadingSpinner';
 import { neumorphismStyles } from '../Employee/Style';
 import { ResponsiveTable } from '../../../components/shared/ResponsiveTable';
+import { capitalizeWords, formatDate } from '../../../utils/common';
 
 const AdminLeave = () => {
   const [leaveRecords, setLeaveRecords] = useState([]);
-  const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
-  const [expandedRow, setExpandedRow] = useState(null);  // Track which row is expanded
+  const [expandedRow, setExpandedRow] = useState(null);
   const { handleSubmit, control, reset, setValue } = useForm();
+
+  const [filters, setFilters] = useState({
+    on_leave: '',
+    start_date: '',
+    end_date: '',
+  });
 
   const theme = useTheme();
   const isLargeScreen = useMediaQuery(theme.breakpoints.up('lg'));
 
   useEffect(() => {
-    fetchLeaveRecords();
+    (filters.start_date || filters.end_date) && fetchLeaveRecords();
+  }, [filters]);
+
+  useEffect(() => {
+   fetchLeaveRecords();
   }, []);
 
   useEffect(() => {
@@ -61,8 +52,9 @@ const AdminLeave = () => {
   const fetchLeaveRecords = async () => {
     setLoading(true);
     try {
-      const { data } = await axios.get('/leave');
-      setLeaveRecords(data);
+      const { data } = await axios.get('/leave', { params: filters });
+      console.log(data?.data)
+      setLeaveRecords(data?.data);
     } catch (error) {
       console.error('Failed to fetch leave records:', error);
     } finally {
@@ -72,7 +64,7 @@ const AdminLeave = () => {
 
   const fetchEmployees = async (search = "") => {
     try {
-      if(!search) return;
+      if (!search) return;
       const { data } = await axios.get("/employee/search", { params: { search } });
       return data.map((employee) => ({
         label: `${employee.name} (${employee.regimentalNo})`,
@@ -113,6 +105,10 @@ const AdminLeave = () => {
     }
   };
 
+  const handleFilterChange = (key, value) => {
+    setFilters((prevFilters) => ({ ...prevFilters, [key]: value }));
+  };
+
   const handleOpen = (record = null) => {
     setEditMode(!!record);
     setSelectedRecord(record);
@@ -130,6 +126,7 @@ const AdminLeave = () => {
     setExpandedRow(expandedRow === id ? null : id);  // Toggle row expansion
   };
 
+
   return (
     <Box sx={neumorphismStyles.container2}>
       <Grid container justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
@@ -144,6 +141,48 @@ const AdminLeave = () => {
         </Button>
       </Grid>
 
+      {/* Filters */}
+      <Grid container spacing={2} sx={{ mb: 2 }}>
+        <Grid item xs={12} md={2.5}>
+          <TextField
+            select
+            fullWidth
+            label="Leave Status"
+            value={filters.on_leave}
+            onChange={(e) => handleFilterChange("on_leave", e.target.value)}
+            sx={neumorphismStyles.input}
+          >
+            <MenuItem value="">All</MenuItem>
+            <MenuItem value="true">On Leave</MenuItem>
+            <MenuItem value="false">Not On Leave</MenuItem>
+          </TextField>
+        </Grid>
+
+        <Grid item xs={12} md={2}>
+          <TextField
+            fullWidth
+            label="Start Date"
+            type="date"
+            InputLabelProps={{ shrink: true }}
+            value={filters.start_date}
+            onChange={(e) => handleFilterChange("start_date", e.target.value)}
+            sx={neumorphismStyles.input}
+          />
+        </Grid>
+
+        <Grid item xs={12} md={2}>
+          <TextField
+            fullWidth
+            label="End Date"
+            type="date"
+            InputLabelProps={{ shrink: true }}
+            value={filters.end_date}
+            onChange={(e) => handleFilterChange("end_date", e.target.value)}
+            sx={neumorphismStyles.input}
+          />
+        </Grid>
+      </Grid>
+
       {loading ? (
         <LoadingSpinner />
       ) : (
@@ -156,7 +195,7 @@ const AdminLeave = () => {
                 <TableCell sx={neumorphismStyles.cell} >Start Date</TableCell>
                 {isLargeScreen && <TableCell sx={neumorphismStyles.cell} >End Date</TableCell>}
                 {isLargeScreen && <TableCell sx={neumorphismStyles.cell} >Status</TableCell>}
-                <TableCell sx={neumorphismStyles.cell}  align="right">Actions</TableCell>
+                <TableCell sx={neumorphismStyles.cell} align="right">Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -166,10 +205,10 @@ const AdminLeave = () => {
                   <TableRow>
                     <TableCell sx={neumorphismStyles.cell} >{record.employee?.name}</TableCell>
                     {isLargeScreen && <TableCell sx={neumorphismStyles.cell} >{record.leaveType}</TableCell>}
-                    <TableCell sx={neumorphismStyles.cell} >{new Date(record.startDate).toLocaleDateString()}</TableCell>
-                    {isLargeScreen && <TableCell sx={neumorphismStyles.cell} >{new Date(record.endDate).toLocaleDateString()}</TableCell>}
-                    {isLargeScreen && <TableCell sx={neumorphismStyles.cell} >{record.status}</TableCell>}
-                    <TableCell sx={neumorphismStyles.cell}  align="right">
+                    <TableCell sx={neumorphismStyles.cell} >{formatDate(record.startDate)}</TableCell>
+                    {isLargeScreen && <TableCell sx={neumorphismStyles.cell} >{formatDate(record.endDate)}</TableCell>}
+                    {isLargeScreen && <TableCell sx={neumorphismStyles.cell} >{capitalizeWords(record.status)}</TableCell>}
+                    <TableCell sx={neumorphismStyles.cell} align="right">
                       <IconButton sx={neumorphismStyles.button} color="primary" onClick={() => toggleRowExpansion(record._id)}>
                         <Visibility />
                       </IconButton>
@@ -179,7 +218,7 @@ const AdminLeave = () => {
                   {/* Expanded Row */}
                   {expandedRow === record._id && (
                     <TableRow>
-                      <TableCell sx={neumorphismStyles.cell}  colSpan={6} >
+                      <TableCell sx={neumorphismStyles.cell} colSpan={6} >
                         <Box sx={{ p: 2 }}>
                           <Typography variant="body2">
                             <strong>Name:</strong> {record.employee?.name}
@@ -191,13 +230,13 @@ const AdminLeave = () => {
                             <strong>Leave Reason:</strong> {record.reason}
                           </Typography>
                           <Typography variant="body2">
-                            <strong>Start Date:</strong> {new Date(record.startDate).toLocaleDateString()}
+                            <strong>Start Date:</strong> {formatDate(record.startDate)}
                           </Typography>
                           <Typography variant="body2">
-                            <strong>End Date:</strong> {new Date(record.endDate).toLocaleDateString()}
+                            <strong>End Date:</strong> {formatDate(record.endDate)}
                           </Typography>
                           <Typography variant="body2">
-                            <strong>Status:</strong> {record.status}
+                            <strong>Status:</strong> {capitalizeWords(record.status)}
                           </Typography>
                           <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
                             <Button sx={neumorphismStyles.button}
@@ -246,9 +285,9 @@ const AdminLeave = () => {
                   value={
                     editMode && selectedRecord
                       ? {
-                          label: `${selectedRecord?.employee.name} (${selectedRecord?.employee.regimentalNo})`,
-                          value: selectedRecord?.employee._id,
-                        }
+                        label: `${selectedRecord?.employee.name} (${selectedRecord?.employee.regimentalNo})`,
+                        value: selectedRecord?.employee._id,
+                      }
                       : null
                   }
                 />

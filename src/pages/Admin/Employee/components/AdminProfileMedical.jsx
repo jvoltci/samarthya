@@ -30,6 +30,7 @@ import axios from '../../../../services/api';
 import { neumorphismStyles } from '../Style';
 import LoadingSpinner from '../../../../components/shared/LoadingSpinner';
 import { useAuth } from '../../../../context/AuthContext';
+import { formatDate } from '../../../../utils/common';
 
 // Styled components for responsive layouts
 const ResponsiveTable = styled(TableContainer)(({ theme }) => ({
@@ -158,7 +159,7 @@ const AdminProfileMedical = ({ employeeId }) => {
                 {/* Main Row */}
                 <TableRow>
                   <TableCell>{record.category}</TableCell>
-                  {isLargeScreen && <TableCell>{new Date(record.date).toLocaleDateString()}</TableCell>}
+                  {isLargeScreen && <TableCell>{formatDate(record.date)}</TableCell>}
                   <TableCell align="right">
                     <IconButton
                       sx={neumorphismStyles.button}
@@ -176,10 +177,7 @@ const AdminProfileMedical = ({ employeeId }) => {
                     <TableCell colSpan={isLargeScreen ? 5 : 3} sx={neumorphismStyles.cell}>
                       <Box sx={{ p: 2 }}>
                         <Typography variant="body2">
-                          <strong>Employee Details:</strong> {record.employee?.name} ({record.employee?.regimentalNo})
-                        </Typography>
-                        <Typography variant="body2">
-                          <strong>Date:</strong> {new Date(record.date).toLocaleDateString()}
+                          <strong>Date:</strong> {formatDate(record.date)}
                         </Typography>
                         <Typography variant="body2">
                           <strong>Category:</strong> {record.category}
