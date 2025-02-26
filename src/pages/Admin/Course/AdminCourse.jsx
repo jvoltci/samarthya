@@ -17,10 +17,9 @@ import {
     DialogActions,
     TextField,
     IconButton,
-    MenuItem,
+    MenuItem
 } from "@mui/material";
 import { Add, Edit, Delete, Visibility } from "@mui/icons-material";
-import { styled } from "@mui/system";
 import axios from "../../../services/api";
 import { useForm, Controller } from "react-hook-form";
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -120,22 +119,28 @@ const AdminCourse = () => {
                     <Table>
                         <TableHead>
                             <TableRow>
+                                <TableCell sx={neumorphismStyles.cell}>#</TableCell>
                                 <TableCell sx={neumorphismStyles.cell} >Course Name</TableCell>
                                 <TableCell sx={neumorphismStyles.cell} >Type</TableCell>
                                 {isLargeScreen && <TableCell sx={neumorphismStyles.cell} >Description</TableCell>}
                                 {isLargeScreen && <TableCell sx={neumorphismStyles.cell} >Duration</TableCell>}
-                                <TableCell sx={neumorphismStyles.cell}  align="right">Actions</TableCell>
+                                <TableCell sx={neumorphismStyles.cell} align="right">Actions</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {courses.map((course) => (
+                            {courses.map((course, index) => (
                                 <React.Fragment key={course._id}>
                                     <TableRow>
+                                        <TableCell sx={neumorphismStyles.cell} width="50px">
+                                            <Typography variant="body2" fontWeight="bold" textAlign="center">
+                                                {index + 1}
+                                            </Typography>
+                                        </TableCell>
                                         <TableCell sx={neumorphismStyles.cell} >{course.name}</TableCell>
                                         <TableCell sx={neumorphismStyles.cell} >{course.type}</TableCell>
                                         {isLargeScreen && <TableCell sx={neumorphismStyles.cell} >{course.description}</TableCell>}
                                         {isLargeScreen && <TableCell sx={neumorphismStyles.cell} >{course.duration}</TableCell>}
-                                        <TableCell sx={neumorphismStyles.cell}  align="right">
+                                        <TableCell sx={neumorphismStyles.cell} align="right">
                                             <IconButton sx={neumorphismStyles.button} color="primary" onClick={() => toggleRowExpansion(course._id)}>
                                                 <Visibility />
                                             </IconButton>
@@ -144,20 +149,20 @@ const AdminCourse = () => {
 
                                     {expandedRow === course._id && (
                                         <TableRow>
-                                            <TableCell sx={neumorphismStyles.cell}  colSpan={isLargeScreen ? 5 : 3}>
+                                            <TableCell sx={neumorphismStyles.cell} colSpan={isLargeScreen ? 5 : 3}>
                                                 <Box sx={{ p: 2 }}>
                                                     <Typography><strong>Name:</strong> {course.name}</Typography>
                                                     <Typography><strong>Type:</strong> {course.type}</Typography>
                                                     <Typography><strong>Description:</strong> {course.description}</Typography>
                                                     <Typography><strong>Duration:</strong> {course.duration}</Typography>
                                                     <Box sx={{ mt: 2, display: "flex", gap: 2 }}>
-                                                        <Button sx={neumorphismStyles.button}
+                                                        <Button size='small' sx={neumorphismStyles.button}
                                                             startIcon={<Edit />}
                                                             onClick={() => handleOpen(course)}
                                                         >
                                                             Edit
                                                         </Button>
-                                                        <Button sx={neumorphismStyles.button}
+                                                        <Button size='small' sx={neumorphismStyles.button}
                                                             startIcon={<Delete />}
                                                             onClick={() => handleDeleteCourse(course._id)}
                                                             color="secondary"

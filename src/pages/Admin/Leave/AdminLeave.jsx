@@ -151,67 +151,67 @@ const AdminLeave = () => {
 
       {/* Filters */}
       {openFilter && (
-  <Grid container spacing={2} sx={{ marginBottom: 2 }}>
-    {/* Leave Status Filter */}
-    <Grid item xs={12} md={2.5}>
-      <TextField
-        select
-        fullWidth
-        label="Leave Status"
-        value={filters.status}
-        onChange={(e) => handleFilterChange("status", e.target.value)}
-        sx={neumorphismStyles.input}
-      >
-        <MenuItem value="">All</MenuItem>
-        <MenuItem value="pending">Pending</MenuItem>
-        <MenuItem value="approved">Approved</MenuItem>
-        <MenuItem value="rejected">Rejected</MenuItem>
-      </TextField>
-    </Grid>
+        <Grid container spacing={2} sx={{ marginBottom: 2 }}>
+          {/* Leave Status Filter */}
+          <Grid item xs={12} md={2.5}>
+            <TextField
+              select
+              fullWidth
+              label="Leave Status"
+              value={filters.status}
+              onChange={(e) => handleFilterChange("status", e.target.value)}
+              sx={neumorphismStyles.input}
+            >
+              <MenuItem value="">All</MenuItem>
+              <MenuItem value="pending">Pending</MenuItem>
+              <MenuItem value="approved">Approved</MenuItem>
+              <MenuItem value="rejected">Rejected</MenuItem>
+            </TextField>
+          </Grid>
 
-    {/* On Leave Filter */}
-    <Grid item xs={12} md={2.5}>
-      <TextField
-        select
-        fullWidth
-        label="On Leave"
-        value={filters.on_leave}
-        onChange={(e) => handleFilterChange("on_leave", e.target.value)}
-        sx={neumorphismStyles.input}
-      >
-        <MenuItem value="">All</MenuItem>
-        <MenuItem value="true">On Leave</MenuItem>
-        <MenuItem value="false">Not On Leave</MenuItem>
-      </TextField>
-    </Grid>
+          {/* On Leave Filter */}
+          <Grid item xs={12} md={2.5}>
+            <TextField
+              select
+              fullWidth
+              label="On Leave"
+              value={filters.on_leave}
+              onChange={(e) => handleFilterChange("on_leave", e.target.value)}
+              sx={neumorphismStyles.input}
+            >
+              <MenuItem value="">All</MenuItem>
+              <MenuItem value="true">On Leave</MenuItem>
+              <MenuItem value="false">Not On Leave</MenuItem>
+            </TextField>
+          </Grid>
 
-    {/* Start Date Filter */}
-    <Grid item xs={12} md={2}>
-      <TextField
-        fullWidth
-        label="Start Date"
-        type="date"
-        InputLabelProps={{ shrink: true }}
-        value={filters.start_date}
-        onChange={(e) => handleFilterChange("start_date", e.target.value)}
-        sx={neumorphismStyles.input}
-      />
-    </Grid>
+          {/* Start Date Filter */}
+          <Grid item xs={12} md={2}>
+            <TextField
+              fullWidth
+              label="Start Date"
+              type="date"
+              InputLabelProps={{ shrink: true }}
+              value={filters.start_date}
+              onChange={(e) => handleFilterChange("start_date", e.target.value)}
+              sx={neumorphismStyles.input}
+            />
+          </Grid>
 
-    {/* End Date Filter */}
-    <Grid item xs={12} md={2}>
-      <TextField
-        fullWidth
-        label="End Date"
-        type="date"
-        InputLabelProps={{ shrink: true }}
-        value={filters.end_date}
-        onChange={(e) => handleFilterChange("end_date", e.target.value)}
-        sx={neumorphismStyles.input}
-      />
-    </Grid>
-  </Grid>
-)}
+          {/* End Date Filter */}
+          <Grid item xs={12} md={2}>
+            <TextField
+              fullWidth
+              label="End Date"
+              type="date"
+              InputLabelProps={{ shrink: true }}
+              value={filters.end_date}
+              onChange={(e) => handleFilterChange("end_date", e.target.value)}
+              sx={neumorphismStyles.input}
+            />
+          </Grid>
+        </Grid>
+      )}
 
 
       {loading ? (
@@ -221,24 +221,30 @@ const AdminLeave = () => {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell sx={neumorphismStyles.cell} >Employee</TableCell>
-                {isLargeScreen && <TableCell sx={neumorphismStyles.cell} >Leave Type</TableCell>}
-                <TableCell sx={neumorphismStyles.cell} >Start Date</TableCell>
-                {isLargeScreen && <TableCell sx={neumorphismStyles.cell} >End Date</TableCell>}
-                {isLargeScreen && <TableCell sx={neumorphismStyles.cell} >Status</TableCell>}
+                <TableCell sx={neumorphismStyles.cell}>#</TableCell>
+                <TableCell sx={neumorphismStyles.cell}>Employee</TableCell>
+                {isLargeScreen && <TableCell sx={neumorphismStyles.cell}>Leave Type</TableCell>}
+                <TableCell sx={neumorphismStyles.cell}>Start Date</TableCell>
+                {isLargeScreen && <TableCell sx={neumorphismStyles.cell}>End Date</TableCell>}
+                {isLargeScreen && <TableCell sx={neumorphismStyles.cell}>Status</TableCell>}
                 <TableCell sx={neumorphismStyles.cell} align="right">Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {leaveRecords.map((record) => (
+              {leaveRecords.map((record, index) => (
                 <React.Fragment key={record._id}>
                   {/* Main Row */}
                   <TableRow>
-                    <TableCell sx={neumorphismStyles.cell} >{record.employee?.name}</TableCell>
-                    {isLargeScreen && <TableCell sx={neumorphismStyles.cell} >{record.leaveType}</TableCell>}
-                    <TableCell sx={neumorphismStyles.cell} >{formatDate(record.startDate)}</TableCell>
-                    {isLargeScreen && <TableCell sx={neumorphismStyles.cell} >{formatDate(record.endDate)}</TableCell>}
-                    {isLargeScreen && <TableCell sx={neumorphismStyles.cell} >{capitalizeWords(record.status)}</TableCell>}
+                    <TableCell sx={neumorphismStyles.cell} width="50px">
+                      <Typography variant="body2" fontWeight="bold" textAlign="center">
+                        {index + 1}
+                      </Typography>
+                    </TableCell>
+                    <TableCell sx={neumorphismStyles.cell}>{record.employee?.name}</TableCell>
+                    {isLargeScreen && <TableCell sx={neumorphismStyles.cell}>{record.leaveType}</TableCell>}
+                    <TableCell sx={neumorphismStyles.cell}>{formatDate(record.startDate)}</TableCell>
+                    {isLargeScreen && <TableCell sx={neumorphismStyles.cell}>{formatDate(record.endDate)}</TableCell>}
+                    {isLargeScreen && <TableCell sx={neumorphismStyles.cell}>{capitalizeWords(record.status)}</TableCell>}
                     <TableCell sx={neumorphismStyles.cell} align="right">
                       <IconButton sx={neumorphismStyles.button} color="primary" onClick={() => toggleRowExpansion(record._id)}>
                         <Visibility />
@@ -249,39 +255,19 @@ const AdminLeave = () => {
                   {/* Expanded Row */}
                   {expandedRow === record._id && (
                     <TableRow>
-                      <TableCell sx={neumorphismStyles.cell} colSpan={6} >
+                      <TableCell sx={neumorphismStyles.cell} colSpan={7}>
                         <Box sx={{ p: 2 }}>
-                          <Typography variant="body2">
-                            <strong>Name:</strong> {record.employee?.name}
-                          </Typography>
-                          <Typography variant="body2">
-                            <strong>Leave Type:</strong> {record.leaveType}
-                          </Typography>
-                          <Typography variant="body2">
-                            <strong>Leave Reason:</strong> {record.reason}
-                          </Typography>
-                          <Typography variant="body2">
-                            <strong>Start Date:</strong> {formatDate(record.startDate)}
-                          </Typography>
-                          <Typography variant="body2">
-                            <strong>End Date:</strong> {formatDate(record.endDate)}
-                          </Typography>
-                          <Typography variant="body2">
-                            <strong>Status:</strong> {capitalizeWords(record.status)}
-                          </Typography>
+                          <Typography variant="body2"><strong>Name:</strong> {record.employee?.name}</Typography>
+                          <Typography variant="body2"><strong>Leave Type:</strong> {record.leaveType}</Typography>
+                          <Typography variant="body2"><strong>Leave Reason:</strong> {record.reason}</Typography>
+                          <Typography variant="body2"><strong>Start Date:</strong> {formatDate(record.startDate)}</Typography>
+                          <Typography variant="body2"><strong>End Date:</strong> {formatDate(record.endDate)}</Typography>
+                          <Typography variant="body2"><strong>Status:</strong> {capitalizeWords(record.status)}</Typography>
                           <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
-                            <Button sx={neumorphismStyles.button}
-                              color="secondary"
-                              startIcon={<Edit />}
-                              onClick={() => handleOpen(record)}
-                            >
+                            <Button size='small' sx={neumorphismStyles.button} color="secondary" startIcon={<Edit />} onClick={() => handleOpen(record)}>
                               Edit
                             </Button>
-                            <Button sx={neumorphismStyles.button}
-                              color='error'
-                              startIcon={<Delete />}
-                              onClick={() => handleDeleteLeaveRecord(record._id)}
-                            >
+                            <Button size='small' sx={neumorphismStyles.button} color="error" startIcon={<Delete />} onClick={() => handleDeleteLeaveRecord(record._id)}>
                               Delete
                             </Button>
                           </Box>
@@ -302,13 +288,13 @@ const AdminLeave = () => {
         <DialogContent sx={neumorphismStyles.container}>
           <Box component="form" noValidate onSubmit={handleSubmit(handleAddLeaveRecord)} sx={{ mt: 2 }}>
             <Controller
-            sx={neumorphismStyles.input}
+              sx={neumorphismStyles.input}
               name="employee"
               control={control}
               rules={{ required: 'Employee is required' }}
               render={({ field, fieldState }) => (
                 <AsyncSelect
-                sx={neumorphismStyles.input}
+                  sx={neumorphismStyles.input}
                   {...field}
                   cacheOptions
                   loadOptions={fetchEmployees}
@@ -338,7 +324,7 @@ const AdminLeave = () => {
                 <FormControl sx={neumorphismStyles.input} fullWidth margin="normal" error={!!fieldState.error}>
                   <InputLabel>Leave Type</InputLabel>
                   <Select {...field}>
-                    <MenuItem  value="EL">EL</MenuItem>
+                    <MenuItem value="EL">EL</MenuItem>
                     <MenuItem value="CL">CL</MenuItem>
                     <MenuItem value="SL">SL</MenuItem>
                   </Select>
@@ -377,7 +363,7 @@ const AdminLeave = () => {
               rules={{ required: 'Start Date is required' }}
               render={({ field, fieldState }) => (
                 <TextField
-                sx={neumorphismStyles.input}
+                  sx={neumorphismStyles.input}
                   {...field}
                   label="Start Date"
                   fullWidth
@@ -406,7 +392,7 @@ const AdminLeave = () => {
               rules={{ required: 'Number of Days is required', min: 1 }}
               render={({ field, fieldState }) => (
                 <TextField
-                sx={neumorphismStyles.input}
+                  sx={neumorphismStyles.input}
                   {...field}
                   label="No. of Days"
                   fullWidth

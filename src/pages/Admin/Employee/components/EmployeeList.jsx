@@ -9,6 +9,8 @@ import {
   DialogContent,
   DialogTitle,
   Button,
+  Typography,
+  Divider,
   Tooltip,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
@@ -20,7 +22,7 @@ import { neumorphismStyles } from '../Style';
 const EmployeeList = ({ employees, onEdit, onDelete }) => {
   const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false);
   const [selectedEmployeeId, setSelectedEmployeeId] = React.useState(null);
-  
+
   const navigate = useNavigate();
 
   const handleViewProfile = (employeeId) => {
@@ -49,35 +51,44 @@ const EmployeeList = ({ employees, onEdit, onDelete }) => {
   return (
     <div>
       <List>
-        {employees.map((employee) => (
-          <ListItem
-            key={employee._id}
-            sx={{ borderBottom: '1px solid #e0e0e0', display: 'flex', justifyContent: 'space-between' }}
-          >
-            <ListItemText
-              primary={employee.name}
-              secondary={`Regimental: ${employee.regimentalNo}${employee.phone ? ', Phone: ' + employee.phone : ''}`}
-            />
-            <div>
+        {employees.map((employee, index) => (
+          <React.Fragment key={employee._id}>
+            <ListItem
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                paddingY: 1,
+                gap: 1
+              }}
+            >
+              <Typography
+                variant="body2"
+                sx={{ width: '25px', textAlign: 'center', fontWeight: 'bold', color: 'gray' }}
+              >
+                {index + 1}.
+              </Typography>
+
+              {/* Employee Details */}
+              <ListItemText
+                primary={employee.name}
+                secondary={`Regimental: ${employee.regimentalNo}${employee.phone ? ', Phone: ' + employee.phone : ''}`}
+                sx={{ flex: 1 }}
+              />
+
+              {/* Actions */}
               <Tooltip title="View Details">
-                <IconButton sx={neumorphismStyles.button} color='secondary' onClick={() => handleViewProfile(employee._id)}>
+                <IconButton sx={neumorphismStyles.button} color="secondary" onClick={() => handleViewProfile(employee._id)}>
                   <VisibilityIcon />
                 </IconButton>
               </Tooltip>
-              {/* <Tooltip title="Edit Employee">
-                <IconButton onClick={() => onEdit(employee)}>
-                  <EditIcon />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title="Delete Employee">
-                <IconButton onClick={() => handleDeleteClick(employee._id)}>
-                  <DeleteIcon />
-                </IconButton>
-              </Tooltip> */}
-            </div>
-          </ListItem>
+            </ListItem>
+
+            {index < employees.length - 1 && <Divider sx={{ backgroundColor: '#e0e0e0' }} />}
+          </React.Fragment>
         ))}
       </List>
+
+
 
       {/* Delete Confirmation Dialog */}
       {/* <Dialog open={openDeleteDialog} onClose={handleCloseDeleteDialog}>

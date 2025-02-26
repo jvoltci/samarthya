@@ -42,7 +42,7 @@ const AdminMedical = () => {
   const [editMode, setEditMode] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
   const { handleSubmit, control, reset, setValue } = useForm();
-  const [expandedRow, setExpandedRow] = useState(null); 
+  const [expandedRow, setExpandedRow] = useState(null);
 
   const theme = useTheme();
   const isLargeScreen = useMediaQuery(theme.breakpoints.up('lg'));
@@ -156,6 +156,7 @@ const AdminMedical = () => {
           <Table>
             <TableHead>
               <TableRow>
+                <TableCell sx={neumorphismStyles.cell}>#</TableCell>
                 <TableCell sx={neumorphismStyles.cell}>Employee</TableCell>
                 <TableCell sx={neumorphismStyles.cell}>Category</TableCell>
                 {isLargeScreen && <TableCell sx={neumorphismStyles.cell}>Date</TableCell>}
@@ -164,10 +165,15 @@ const AdminMedical = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {medicalRecords.map((record) => (
+              {medicalRecords.map((record, index) => (
                 <React.Fragment key={record._id}>
                   {/* Main Row */}
                   <TableRow>
+                    <TableCell sx={neumorphismStyles.cell} width="50px">
+                      <Typography variant="body2" fontWeight="bold" textAlign="center">
+                        {index + 1}
+                      </Typography>
+                    </TableCell>
                     <TableCell sx={neumorphismStyles.cell}>{record.employee?.name}</TableCell>
                     <TableCell sx={neumorphismStyles.cell}>{record.category}</TableCell>
                     {isLargeScreen && <TableCell sx={neumorphismStyles.cell}>{formatDate(record.date)}</TableCell>}
@@ -203,6 +209,7 @@ const AdminMedical = () => {
                           <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
                             <Button sx={neumorphismStyles.button}
                               color="primary"
+                              size='small'
                               startIcon={<Edit />}
                               onClick={() => handleOpen(record)}
                             >
@@ -210,6 +217,7 @@ const AdminMedical = () => {
                             </Button>
                             <Button sx={neumorphismStyles.button}
                               color="secondary"
+                              size='small'
                               startIcon={<Delete />}
                               onClick={() => handleDeleteMedicalRecord(record._id)}
                             >

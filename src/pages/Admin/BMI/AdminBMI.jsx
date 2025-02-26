@@ -185,6 +185,7 @@ const AdminBMI = () => {
           <Table>
             <TableHead>
               <TableRow>
+                <TableCell sx={neumorphismStyles.cell}>#</TableCell>
                 <TableCell sx={neumorphismStyles.cell} >Employee</TableCell>
                 {isLargeScreen && <TableCell sx={neumorphismStyles.cell} >Weight (kg)</TableCell>}
                 {isLargeScreen && <TableCell sx={neumorphismStyles.cell} >Height (cm)</TableCell>}
@@ -193,10 +194,15 @@ const AdminBMI = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {bmiRecords.map((record) => (
+              {bmiRecords.map((record, index) => (
                 <React.Fragment key={record._id}>
                   {/* Main Row */}
                   <TableRow>
+                    <TableCell sx={neumorphismStyles.cell} width="50px">
+                      <Typography variant="body2" fontWeight="bold" textAlign="center">
+                        {index + 1}
+                      </Typography>
+                    </TableCell>
                     <TableCell sx={neumorphismStyles.cell} >{`${record.employee?.name} (${record.employee?.regimentalNo})`}</TableCell>
                     {isLargeScreen && <TableCell sx={neumorphismStyles.cell} >{record.weight}</TableCell>}
                     {isLargeScreen && <TableCell sx={neumorphismStyles.cell} >{record.height}</TableCell>}
@@ -228,6 +234,7 @@ const AdminBMI = () => {
                           <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
                             <Button sx={neumorphismStyles.button}
                               color="primary"
+                              size='small'
                               startIcon={<Edit />}
                               onClick={() => handleOpen(record)}
                             >
@@ -235,6 +242,7 @@ const AdminBMI = () => {
                             </Button>
                             <Button sx={neumorphismStyles.button}
                               color="secondary"
+                              size='small'
                               startIcon={<Delete />}
                               onClick={() => handleDeleteRecord(record._id)}
                             >
@@ -255,7 +263,7 @@ const AdminBMI = () => {
       {/* Modal for Add/Edit */}
       <Dialog open={open} onClose={handleClose} fullWidth>
         <DialogTitle>{editMode ? "Edit BMI Record" : "Add BMI Record"}</DialogTitle>
-        <DialogContent>
+        <DialogContent sx={neumorphismStyles.container}>
           <Box component="form" noValidate onSubmit={handleSubmit(handleSaveRecord)} sx={{ mt: 2 }}>
             <Controller
               name="employee"
@@ -327,8 +335,7 @@ const AdminBMI = () => {
               )}
             />
           </Box>
-        </DialogContent>
-        <DialogActions>
+          <DialogActions>
           <Button sx={neumorphismStyles.button} onClick={handleClose} >
             Cancel
           </Button>
@@ -336,6 +343,7 @@ const AdminBMI = () => {
             {editMode ? "Save" : "Add"}
           </Button>
         </DialogActions>
+        </DialogContent>
       </Dialog>
     </Box>
   );

@@ -1,4 +1,56 @@
 export const neumorphismStyles = {
+  appBar: {
+    background: "#e0e0e0",
+    boxShadow: "8px 8px 16px #bebebe, -8px -8px 16px #ffffff",
+    borderRadius: "12px",
+    padding: "8px 16px",
+    margin: "8px",
+  },
+  iconButton: {
+    background: "#e0e0e0",
+    boxShadow: "4px 4px 8px #bebebe, -4px -4px 8px #ffffff",
+    borderRadius: "50%",
+    padding: "8px",
+    transition: "all 0.3s ease",
+    "&:hover": {
+      boxShadow: "inset 4px 4px 8px #bebebe, inset -4px -4px 8px #ffffff",
+    },
+  },
+  title: {
+    fontWeight: "bold",
+    color: "#555",
+    textShadow: "1px 1px 2px #bebebe",
+    flexGrow: 1,
+  },
+  subtitle: {
+    fontStyle: "italic",
+    color: "#777",
+    textShadow: "1px 1px 2px #bebebe",
+    display: "flex",
+    alignItems: "center",
+  },
+  logoutButton: {
+    background: "#e0e0e0",
+    boxShadow: "4px 4px 8px #bebebe, -4px -4px 8px #ffffff",
+    borderRadius: "12px",
+    padding: "6px 12px",
+    fontSize: "0.575rem",
+    marginLeft: "12px",
+    "&:hover": {
+      background: "#d1d9e6",
+    },
+  },
+  logoBox: {
+    background: "#e0e0e0",
+    boxShadow: "inset 4px 4px 8px #bebebe, inset -4px -4px 8px #ffffff",
+    borderRadius: "50%",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "40px",
+    height: "40px",
+    marginRight: "8px",
+  },
   container: {
     p: 3,
     background: '#E0E5EC',

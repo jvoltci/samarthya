@@ -88,6 +88,7 @@ const AdminUserManagement = () => {
         <Table>
           <TableHead>
             <TableRow>
+              <TableCell sx={neumorphismStyles.cell}>#</TableCell>
               <TableCell sx={neumorphismStyles.cell}>Regimental No</TableCell>
               <TableCell sx={neumorphismStyles.cell}>Role</TableCell>
               <TableCell sx={neumorphismStyles.cell}>Password</TableCell>
@@ -95,8 +96,13 @@ const AdminUserManagement = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {users.map((user) => (
+            {users.map((user, index) => (
               <TableRow key={user._id}>
+                <TableCell sx={neumorphismStyles.cell} width="50px">
+                  <Typography variant="body2" fontWeight="bold" textAlign="center">
+                    {index + 1}
+                  </Typography>
+                </TableCell>
                 <TableCell sx={neumorphismStyles.cell}>{user.regimentalNo}</TableCell>
                 <TableCell sx={neumorphismStyles.cell}>{user.role}</TableCell>
                 <TableCell sx={neumorphismStyles.cell}>{user.password}</TableCell>

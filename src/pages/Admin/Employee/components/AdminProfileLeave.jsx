@@ -130,6 +130,7 @@ const AdminProfileLeave = ({ employeeId }) => {
           <Table>
             <TableHead>
               <TableRow>
+                
                 <TableCell>Leave Type</TableCell>
                 <TableCell>Start Date</TableCell>
                 {isLargeScreen && <TableCell>End Date</TableCell>}
@@ -177,10 +178,10 @@ const AdminProfileLeave = ({ employeeId }) => {
                             <strong>Status:</strong> {capitalizeWords(record.status)}
                           </Typography>
                           {user?.role === 'admin' && (<Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
-                            <Button sx={neumorphismStyles.button} variant="outlined" color="secondary" startIcon={<Edit />} onClick={() => handleOpen(record)}>
+                            <Button size='small' sx={neumorphismStyles.button} variant="outlined" color="secondary" startIcon={<Edit />} onClick={() => handleOpen(record)}>
                               Edit
                             </Button>
-                            <Button sx={neumorphismStyles.button} variant="outlined" color="primary" startIcon={<Delete />} onClick={() => handleDeleteLeaveRecord(record._id)}>
+                            <Button size='small' sx={neumorphismStyles.button} variant="outlined" color="primary" startIcon={<Delete />} onClick={() => handleDeleteLeaveRecord(record._id)}>
                               Delete
                             </Button>
                           </Box>)}

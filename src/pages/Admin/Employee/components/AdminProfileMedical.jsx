@@ -40,7 +40,7 @@ const ResponsiveTable = styled(TableContainer)(({ theme }) => ({
 }));
 
 const AdminProfileMedical = ({ employeeId }) => {
-  const [medicalRecords, setMedicalRecords] = useState([]);
+  const [medicalRecord, setMedicalRecord] = useState(null);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [editMode, setEditMode] = useState(false);
@@ -70,8 +70,8 @@ const AdminProfileMedical = ({ employeeId }) => {
   const fetchMedicalRecords = async () => {
     setLoading(true);
     try {
-      const { data } = await axios.get('/medical', { params: { employee_id: employeeId } });
-      setMedicalRecords(data);
+      const { data } = await axios.get('/medical', { params: { employee_id: employeeId, sort: 'desc' } });
+      setMedicalRecord(data?.length ? data[0] : null);
     } catch (error) {
       console.error('Failed to fetch medical records:', error);
     } finally {
@@ -129,7 +129,7 @@ const AdminProfileMedical = ({ employeeId }) => {
     <Box sx={{ p: 2 }}>
       <Grid container justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
         <Typography variant="h4">Medical</Typography>
-        {!medicalRecords.length && (<Button
+        {!medicalRecord && (<Button
           color="primary"
           startIcon={<Add />}
           onClick={() => handleOpen()}
@@ -142,9 +142,8 @@ const AdminProfileMedical = ({ employeeId }) => {
 
       {loading ? (
         <LoadingSpinner />
-      ) : (
-
-        medicalRecords.length ? medicalRecords.map((record) => (<ResponsiveTable>
+      ) : medicalRecord ? (
+        <ResponsiveTable>
           <Table>
             <TableHead>
               <TableRow>
@@ -154,17 +153,16 @@ const AdminProfileMedical = ({ employeeId }) => {
               </TableRow>
             </TableHead>
             <TableBody>
-
-              <React.Fragment key={record._id}>
+              <React.Fragment key={medicalRecord._id}>
                 {/* Main Row */}
                 <TableRow>
-                  <TableCell>{record.category}</TableCell>
-                  {isLargeScreen && <TableCell>{formatDate(record.date)}</TableCell>}
+                  <TableCell>{medicalRecord.category}</TableCell>
+                  {isLargeScreen && <TableCell>{formatDate(medicalRecord.date)}</TableCell>}
                   <TableCell align="right">
                     <IconButton
                       sx={neumorphismStyles.button}
                       color="primary"
-                      onClick={() => toggleRowExpansion(record._id)}
+                      onClick={() => toggleRowExpansion(medicalRecord._id)}
                     >
                       <Visibility />
                     </IconButton>
@@ -172,39 +170,44 @@ const AdminProfileMedical = ({ employeeId }) => {
                 </TableRow>
 
                 {/* Expanded Row */}
-                {expandedRow === record._id && (
+                {expandedRow === medicalRecord._id && (
                   <TableRow>
                     <TableCell colSpan={isLargeScreen ? 5 : 3} sx={neumorphismStyles.cell}>
                       <Box sx={{ p: 2 }}>
                         <Typography variant="body2">
-                          <strong>Date:</strong> {formatDate(record.date)}
+                          <strong>Date:</strong> {formatDate(medicalRecord.date)}
                         </Typography>
                         <Typography variant="body2">
-                          <strong>Category:</strong> {record.category}
+                          <strong>Category:</strong> {medicalRecord.category}
                         </Typography>
                         <Typography variant="body2">
-                          <strong>Description:</strong> {record.description}
+                          <strong>Description:</strong> {medicalRecord.description}
                         </Typography>
-                        {user?.role === 'admin' && (<Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
-                          <Button
-                            sx={neumorphismStyles.button}
-                            variant="outlined"
-                            color="secondary"
-                            startIcon={<Edit />}
-                            onClick={() => handleOpen(record)}
-                          >
-                            Edit
-                          </Button>
-                          <Button
-                            sx={neumorphismStyles.button}
-                            variant="outlined"
-                            color="primary"
-                            startIcon={<Delete />}
-                            onClick={() => handleDeleteMedicalRecord(record._id)}
-                          >
-                            Delete
-                          </Button>
-                        </Box>)}
+
+                        {user?.role === 'admin' && (
+                          <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
+                            <Button
+                              sx={neumorphismStyles.button}
+                              variant="outlined"
+                              size='small'
+                              color="secondary"
+                              startIcon={<Edit />}
+                              onClick={() => handleOpen(medicalRecord)}
+                            >
+                              Edit
+                            </Button>
+                            <Button
+                              sx={neumorphismStyles.button}
+                              variant="outlined"
+                              color="primary"
+                              size='small'
+                              startIcon={<Delete />}
+                              onClick={() => handleDeleteMedicalRecord(medicalRecord._id)}
+                            >
+                              Delete
+                            </Button>
+                          </Box>
+                        )}
                       </Box>
                     </TableCell>
                   </TableRow>
@@ -212,8 +215,11 @@ const AdminProfileMedical = ({ employeeId }) => {
               </React.Fragment>
             </TableBody>
           </Table>
-        </ResponsiveTable>)) : null)
-      }
+        </ResponsiveTable>
+      ) : (
+        <Typography sx={{ textAlign: "center", color: "#777" }}>No medical record found</Typography>
+      )}
+
 
       {/* Modal for Add/Edit */}
       <Dialog open={open} onClose={handleClose} fullWidth>

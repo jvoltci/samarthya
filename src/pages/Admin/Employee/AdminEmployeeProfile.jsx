@@ -36,7 +36,7 @@ const AdminEmployeeProfile = () => {
 
   const pathParts = location.pathname.split('/');
   const id = pathParts[pathParts.length - 1];
-  
+
   useEffect(() => {
     fetchEmployeeDetails();
   }, [id]);
@@ -176,32 +176,191 @@ const AdminEmployeeProfile = () => {
         {/* Right Column - Courses & Equipment */}
         <Grid item xs={12} sm={6} container spacing={3}>
           {/* Courses Section */}
-          <Grid item xs={12} >
-            <Paper elevation={0} sx={neumorphismStyles.paper}>
-              <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Courses</Typography>
-              {employee?.courses?.map((course, index) => (
-                <Typography key={index}>{course.name}</Typography>
-              ))}
-              {user?.role === 'admin' && (<Button sx={neumorphismStyles.button}  color='info' onClick={() => setOpenCourseDialog(true)} disabled={!editing}>
-                Manage Courses
-              </Button>)}
+          <Grid item xs={12}>
+            <Paper
+              elevation={0}
+              sx={{
+                background: "#e0e0e0",
+                boxShadow: "inset 6px 6px 12px #bebebe, inset -6px -6px 12px #ffffff",
+                borderRadius: "16px",
+                padding: "16px",
+                textAlign: "center",
+              }}
+            >
+              <Typography
+                variant="h6"
+                sx={{
+                  fontWeight: "bold",
+                  color: "#555",
+                  textShadow: "1px 1px 2px #bebebe",
+                  marginBottom: "12px"
+                }}
+              >
+                📚 Courses
+              </Typography>
+
+              {/* Flexbox Wrapping */}
+              <Box sx={{
+                display: "flex",
+                flexWrap: "wrap",
+                justifyContent: "flex-start",
+                gap: "10px",
+                padding: "8px",
+              }}>
+                {employee?.courses?.length > 0 ? (
+                  employee?.courses?.map((course, index) => (
+                    <Typography
+                      key={index}
+                      sx={{
+                        fontSize: "1rem",
+                        color: "#444",
+                        padding: "6px 12px",
+                        borderRadius: "8px",
+                        background: "#e0e0e0",
+                        boxShadow: "4px 4px 8px #bebebe, -4px -4px 8px #ffffff",
+                        display: "inline-block",
+                        minWidth: "120px",
+                        textAlign: "center",
+                        flex: "1 1 auto",
+                        maxWidth: "180px"
+                      }}
+                    >
+                      {course.name}
+                    </Typography>
+                  ))
+                ) : (
+                  <Typography sx={{ fontSize: "1rem", color: "#777" }}>
+                    No courses assigned
+                  </Typography>
+                )}
+              </Box>
+
+              {user?.role === "admin" && (
+                <Button
+                  sx={{
+                    background: "#e0e0e0",
+                    boxShadow: "6px 6px 12px #bebebe, -6px -6px 12px #ffffff",
+                    borderRadius: "12px",
+                    padding: "8px 16px",
+                    fontSize: "0.875rem",
+                    fontWeight: "bold",
+                    marginTop: "16px",
+                    transition: "all 0.3s ease",
+                    "&:hover": {
+                      boxShadow: "inset 4px 4px 8px #bebebe, inset -4px -4px 8px #ffffff",
+                      background: "#d1d9e6",
+                    },
+                    "&:disabled": {
+                      background: "#f0f0f0",
+                      boxShadow: "none",
+                      color: "#aaa",
+                    },
+                  }}
+                  color="info"
+                  onClick={() => setOpenCourseDialog(true)}
+                  disabled={!editing}
+                >
+                  Manage Courses
+                </Button>
+              )}
+
               <CourseDialog open={openCourseDialog} onClose={() => setOpenCourseDialog(false)} employee={employee} setEmployee={setEmployee} />
             </Paper>
           </Grid>
 
           {/* Equipment Section */}
-          <Grid item xs={12} >
-            <Paper elevation={0} sx={neumorphismStyles.paper}>
-              <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Equipment</Typography>
-              {employee?.equipment?.map((equipment, index) => (
-                <Typography key={index}>{equipment.name}</Typography>
-              ))}
-              {user?.role === 'admin' && (<Button sx={neumorphismStyles.button}  color='info' onClick={() => setOpenEquipmentDialog(true)} disabled={!editing}>
-                Manage Equipment
-              </Button>)}
+          <Grid item xs={12}>
+            <Paper
+              elevation={0}
+              sx={{
+                background: "#e0e0e0",
+                boxShadow: "inset 6px 6px 12px #bebebe, inset -6px -6px 12px #ffffff",
+                borderRadius: "16px",
+                padding: "16px",
+                textAlign: "center",
+              }}
+            >
+              <Typography
+                variant="h6"
+                sx={{
+                  fontWeight: "bold",
+                  color: "#555",
+                  textShadow: "1px 1px 2px #bebebe",
+                  marginBottom: "12px"
+                }}
+              >
+                🛠 Equipment
+              </Typography>
+
+              {/* Flexbox Wrapping */}
+              <Box sx={{
+                display: "flex",
+                flexWrap: "wrap",
+                justifyContent: "flex-start",
+                gap: "10px",
+                padding: "8px",
+              }}>
+                {employee?.equipment?.length > 0 ? (
+                  employee?.equipment?.map((equipment, index) => (
+                    <Typography
+                      key={index}
+                      sx={{
+                        fontSize: "1rem",
+                        color: "#444",
+                        padding: "6px 12px",
+                        borderRadius: "8px",
+                        background: "#e0e0e0",
+                        boxShadow: "4px 4px 8px #bebebe, -4px -4px 8px #ffffff",
+                        display: "inline-block",
+                        minWidth: "120px",
+                        textAlign: "center",
+                        flex: "1 1 auto",
+                        maxWidth: "180px"
+                      }}
+                    >
+                      {equipment.name}
+                    </Typography>
+                  ))
+                ) : (
+                  <Typography sx={{ fontSize: "1rem", color: "#777" }}>
+                    No equipment assigned
+                  </Typography>
+                )}
+              </Box>
+
+              {user?.role === "admin" && (
+                <Button
+                  sx={{
+                    background: "#e0e0e0",
+                    boxShadow: "6px 6px 12px #bebebe, -6px -6px 12px #ffffff",
+                    borderRadius: "12px",
+                    padding: "8px 16px",
+                    fontSize: "0.875rem",
+                    fontWeight: "bold",
+                    marginTop: "16px",
+                    transition: "all 0.3s ease",
+                    "&:hover": {
+                      boxShadow: "inset 4px 4px 8px #bebebe, inset -4px -4px 8px #ffffff",
+                      background: "#d1d9e6",
+                    },
+                    "&:disabled": {
+                      background: "#f0f0f0",
+                      boxShadow: "none",
+                      color: "#aaa",
+                    },
+                  }}
+                  color="info"
+                  onClick={() => setOpenEquipmentDialog(true)}
+                  disabled={!editing}
+                >
+                  Manage Equipment
+                </Button>
+              )}
+
               <EquipmentDialog open={openEquipmentDialog} onClose={() => setOpenEquipmentDialog(false)} employee={employee} setEmployee={setEmployee} />
             </Paper>
           </Grid>
+
         </Grid>
 
         {/* Action Buttons */}
@@ -215,7 +374,7 @@ const AdminEmployeeProfile = () => {
                 Save Changes
               </Button>
             ) : (
-              <Button sx={neumorphismStyles.button}  color='inherit' onClick={() => setEditing(true)}>
+              <Button sx={neumorphismStyles.button} color='inherit' onClick={() => setEditing(true)}>
                 Edit
               </Button>
             )}

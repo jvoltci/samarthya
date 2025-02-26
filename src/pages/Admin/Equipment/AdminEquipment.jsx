@@ -186,6 +186,7 @@ const AdminEquipment = () => {
           <Table>
             <TableHead>
               <TableRow>
+                <TableCell sx={neumorphismStyles.cell}>#</TableCell>
                 <TableCell sx={neumorphismStyles.cell}>Name</TableCell>
                 <TableCell sx={neumorphismStyles.cell}>Category</TableCell>
                 {isLargeScreen && <TableCell sx={neumorphismStyles.cell}>Status</TableCell>}
@@ -193,9 +194,14 @@ const AdminEquipment = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {equipment.map((record) => (
+              {equipment.map((record, index) => (
                 <React.Fragment key={record._id}>
                   <TableRow >
+                    <TableCell sx={neumorphismStyles.cell} width="50px">
+                      <Typography variant="body2" fontWeight="bold" textAlign="center">
+                        {index + 1}
+                      </Typography>
+                    </TableCell>
                     <TableCell sx={neumorphismStyles.cell}>{record.name}</TableCell>
                     <TableCell sx={neumorphismStyles.cell}>{record.category.name}</TableCell>
                     {isLargeScreen && <TableCell sx={neumorphismStyles.cell}>{record.status}</TableCell>}
@@ -246,6 +252,7 @@ const AdminEquipment = () => {
                           <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
                             <Button sx={neumorphismStyles.button}
                               color="primary"
+                              size='small'
                               startIcon={<Edit />}
                               onClick={() => handleOpen(record)}
                             >
@@ -253,6 +260,7 @@ const AdminEquipment = () => {
                             </Button>
                             <Button sx={neumorphismStyles.button}
                               color="secondary"
+                              size='small'
                               startIcon={<Delete />}
                               onClick={() => handleDeleteEquipment(record._id)}
                             >
