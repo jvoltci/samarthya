@@ -7,9 +7,11 @@ import {
 } from '@mui/material';
 import { neumorphismStyles } from '../Employee/Style';
 import { Delete } from '@mui/icons-material';
+import LoadingSpinner from '../../../components/shared/LoadingSpinner';
 
 const AdminUserManagement = () => {
   const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleteUserId, setDeleteUserId] = useState(null);
@@ -21,11 +23,14 @@ const AdminUserManagement = () => {
   }, []);
 
   const fetchUsers = async () => {
+    setLoading(true);
     try {
       const { data } = await axios.get('/user');
       setUsers(data);
     } catch (error) {
       console.error('Failed to fetch users:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -77,7 +82,9 @@ const AdminUserManagement = () => {
       </Button>
 
       {/* User Table */}
-      <TableContainer component={Paper} sx={{ mt: 3 }}>
+      {loading ? (
+        <LoadingSpinner />
+      ) : (<TableContainer component={Paper} sx={{ mt: 3 }}>
         <Table>
           <TableHead>
             <TableRow>
@@ -109,7 +116,7 @@ const AdminUserManagement = () => {
             ))}
           </TableBody>
         </Table>
-      </TableContainer>
+      </TableContainer>)}
 
       {/* Add User Dialog */}
       <Dialog open={open} onClose={() => setOpen(false)}>

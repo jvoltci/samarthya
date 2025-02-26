@@ -247,7 +247,7 @@ const AdminProfileMedical = ({ employeeId }) => {
                   <InputLabel>Category</InputLabel>
                   <Select {...field}>
                     <MenuItem value="SHAPE1">SHAPE1</MenuItem>
-                    <MenuItem value="SHAPE5">SHAPE5</MenuItem>
+                    <MenuItem value="Other">Other</MenuItem>
                   </Select>
                   {fieldState.error && <span>{fieldState.error.message}</span>}
                 </FormControl>

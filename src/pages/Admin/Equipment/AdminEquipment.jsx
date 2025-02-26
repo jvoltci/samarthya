@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Typography, Box, Grid, Button, Table, TableBody, TableCell, TableHead, TableRow, Dialog, DialogTitle, DialogContent, DialogActions, TextField, IconButton, FormControl, InputLabel, Select, MenuItem, Checkbox, FormControlLabel,
+  Typography, Box, Grid, Button, Table, TableBody, TableCell, TableHead, TableRow, Dialog, DialogTitle, DialogContent, DialogActions, TextField, IconButton, FormControl, InputLabel, Select, MenuItem, Checkbox, FormControlLabel, Tooltip,
 } from '@mui/material';
 import { Add, Edit, Delete, Visibility } from '@mui/icons-material';
 import axios from '../../../services/api';
@@ -11,6 +11,7 @@ import LoadingSpinner from '../../../components/shared/LoadingSpinner';
 import { neumorphismStyles } from '../Employee/Style';
 import { ResponsiveTable } from '../../../components/shared/ResponsiveTable';
 import { formatDate } from '../../../utils/common';
+import TuneIcon from '@mui/icons-material/Tune';
 
 const AdminEquipment = () => {
   const [equipment, setEquipment] = useState([]);
@@ -23,6 +24,7 @@ const AdminEquipment = () => {
   const [expandedRow, setExpandedRow] = useState(null); // To track the expanded row
   const theme = useTheme();
   const [statusFilter, setStatusFilter] = useState('');
+  const [openFilter, setOpenFilter] = useState(false);
   const isLargeScreen = useMediaQuery(theme.breakpoints.up('lg'));
 
   useEffect(() => {
@@ -95,6 +97,17 @@ const AdminEquipment = () => {
     }
   };
 
+  const handleDeleteEquipment = async (id) => {
+    if (window.confirm('Are you sure you want to delete this equipment?')) {
+      try {
+        await axios.delete(`/equipment/${id}`);
+        fetchEquipment();
+      } catch (error) {
+        console.error('Failed to delete equipment:', error);
+      }
+    }
+  };
+
   // Open modal for adding/editing equipment
   const handleOpen = (record = null) => {
     setEditMode(!!record);
@@ -128,21 +141,14 @@ const AdminEquipment = () => {
     <Box sx={neumorphismStyles.container2}>
 
       <Grid container justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
-        <Typography variant="h4">Equipment</Typography>
-        <FormControl sx={{ minWidth: 180, my: 1 }}>
-          <InputLabel>Status</InputLabel>
-          <Select
-            sx={neumorphismStyles.input}
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-          >
-            <MenuItem value="">All</MenuItem>
-            <MenuItem value="In Use">In Use</MenuItem>
-            <MenuItem value="Available">Available</MenuItem>
-            <MenuItem value="Under Maintenance">Under Maintenance</MenuItem>
-            <MenuItem value="Retired">Retired</MenuItem>
-          </Select>
-        </FormControl>
+        <Typography variant="h4">Equipment
+          <Tooltip title="Filters">
+            <IconButton size="small" sx={{ ml: 1, ...neumorphismStyles.button }} color={openFilter ? 'success' : ''} onClick={() => setOpenFilter(prev => !prev)}>
+              <TuneIcon />
+            </IconButton>
+          </Tooltip>
+        </Typography>
+
         <Button sx={neumorphismStyles.button2}
           variant="outlined"
           color="primary"
@@ -152,6 +158,26 @@ const AdminEquipment = () => {
           Add Equipment
         </Button>
       </Grid>
+
+      {/* Filters */}
+      {openFilter && (<Grid container spacing={2} sx={{ mb: 2 }}>
+        <Grid item xs={12} md={2.5}>
+          <FormControl sx={{ minWidth: 180, my: 1 }}>
+            <InputLabel>Status</InputLabel>
+            <Select
+              sx={neumorphismStyles.input}
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+            >
+              <MenuItem value="">All</MenuItem>
+              <MenuItem value="In Use">In Use</MenuItem>
+              <MenuItem value="Available">Available</MenuItem>
+              <MenuItem value="Under Maintenance">Under Maintenance</MenuItem>
+              <MenuItem value="Retired">Retired</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>
+      </Grid>)}
 
       {loading ? (
         <LoadingSpinner />
@@ -228,7 +254,7 @@ const AdminEquipment = () => {
                             <Button sx={neumorphismStyles.button}
                               color="secondary"
                               startIcon={<Delete />}
-                              onClick={() => handleDeleteMedicalRecord(record._id)}
+                              onClick={() => handleDeleteEquipment(record._id)}
                             >
                               Delete
                             </Button>

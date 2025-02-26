@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Typography, Box, Grid, Button, Paper, Table, TableBody, TableCell, TableHead, TableRow, Dialog, DialogTitle, DialogContent, DialogActions, TextField, IconButton, MenuItem, FormControl, InputLabel, Select,
+  Typography, Box, Grid, Button, Paper, Table, TableBody, TableCell, TableHead, TableRow, Dialog, DialogTitle, DialogContent, DialogActions, TextField, IconButton, MenuItem, FormControl, InputLabel, Select, Tooltip, FormLabel,
 } from '@mui/material';
 import { Add, Edit, Delete, Visibility } from '@mui/icons-material';
 import axios from '../../../services/api';
+import TuneIcon from '@mui/icons-material/Tune';
 import { useForm, Controller } from 'react-hook-form';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
@@ -20,7 +21,8 @@ const AdminLeave = () => {
   const [editMode, setEditMode] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [expandedRow, setExpandedRow] = useState(null);
-  const { handleSubmit, control, reset, setValue } = useForm();
+  const [openFilter, setOpenFilter] = useState(false);
+  const { handleSubmit, control, reset, watch, setValue } = useForm();
 
   const [filters, setFilters] = useState({
     on_leave: '',
@@ -32,11 +34,11 @@ const AdminLeave = () => {
   const isLargeScreen = useMediaQuery(theme.breakpoints.up('lg'));
 
   useEffect(() => {
-    (filters.start_date || filters.end_date) && fetchLeaveRecords();
+    fetchLeaveRecords();
   }, [filters]);
 
   useEffect(() => {
-   fetchLeaveRecords();
+    fetchLeaveRecords();
   }, []);
 
   useEffect(() => {
@@ -53,7 +55,6 @@ const AdminLeave = () => {
     setLoading(true);
     try {
       const { data } = await axios.get('/leave', { params: filters });
-      console.log(data?.data)
       setLeaveRecords(data?.data);
     } catch (error) {
       console.error('Failed to fetch leave records:', error);
@@ -130,7 +131,13 @@ const AdminLeave = () => {
   return (
     <Box sx={neumorphismStyles.container2}>
       <Grid container justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
-        <Typography variant="h4">Leaves</Typography>
+        <Typography variant="h4">Leaves
+          <Tooltip title="Filters">
+            <IconButton size="small" sx={{ ml: 1, ...neumorphismStyles.button }} color={openFilter ? 'success' : ''} onClick={() => setOpenFilter(prev => !prev)}>
+              <TuneIcon />
+            </IconButton>
+          </Tooltip>
+        </Typography>
         <Button sx={neumorphismStyles.button2}
           color="primary"
           variant='outlined'
@@ -138,50 +145,74 @@ const AdminLeave = () => {
           onClick={() => handleOpen()}
         >
           Add Leave
+
         </Button>
       </Grid>
 
       {/* Filters */}
-      <Grid container spacing={2} sx={{ mb: 2 }}>
-        <Grid item xs={12} md={2.5}>
-          <TextField
-            select
-            fullWidth
-            label="Leave Status"
-            value={filters.on_leave}
-            onChange={(e) => handleFilterChange("on_leave", e.target.value)}
-            sx={neumorphismStyles.input}
-          >
-            <MenuItem value="">All</MenuItem>
-            <MenuItem value="true">On Leave</MenuItem>
-            <MenuItem value="false">Not On Leave</MenuItem>
-          </TextField>
-        </Grid>
+      {openFilter && (
+  <Grid container spacing={2} sx={{ marginBottom: 2 }}>
+    {/* Leave Status Filter */}
+    <Grid item xs={12} md={2.5}>
+      <TextField
+        select
+        fullWidth
+        label="Leave Status"
+        value={filters.status}
+        onChange={(e) => handleFilterChange("status", e.target.value)}
+        sx={neumorphismStyles.input}
+      >
+        <MenuItem value="">All</MenuItem>
+        <MenuItem value="pending">Pending</MenuItem>
+        <MenuItem value="approved">Approved</MenuItem>
+        <MenuItem value="rejected">Rejected</MenuItem>
+      </TextField>
+    </Grid>
 
-        <Grid item xs={12} md={2}>
-          <TextField
-            fullWidth
-            label="Start Date"
-            type="date"
-            InputLabelProps={{ shrink: true }}
-            value={filters.start_date}
-            onChange={(e) => handleFilterChange("start_date", e.target.value)}
-            sx={neumorphismStyles.input}
-          />
-        </Grid>
+    {/* On Leave Filter */}
+    <Grid item xs={12} md={2.5}>
+      <TextField
+        select
+        fullWidth
+        label="On Leave"
+        value={filters.on_leave}
+        onChange={(e) => handleFilterChange("on_leave", e.target.value)}
+        sx={neumorphismStyles.input}
+      >
+        <MenuItem value="">All</MenuItem>
+        <MenuItem value="true">On Leave</MenuItem>
+        <MenuItem value="false">Not On Leave</MenuItem>
+      </TextField>
+    </Grid>
 
-        <Grid item xs={12} md={2}>
-          <TextField
-            fullWidth
-            label="End Date"
-            type="date"
-            InputLabelProps={{ shrink: true }}
-            value={filters.end_date}
-            onChange={(e) => handleFilterChange("end_date", e.target.value)}
-            sx={neumorphismStyles.input}
-          />
-        </Grid>
-      </Grid>
+    {/* Start Date Filter */}
+    <Grid item xs={12} md={2}>
+      <TextField
+        fullWidth
+        label="Start Date"
+        type="date"
+        InputLabelProps={{ shrink: true }}
+        value={filters.start_date}
+        onChange={(e) => handleFilterChange("start_date", e.target.value)}
+        sx={neumorphismStyles.input}
+      />
+    </Grid>
+
+    {/* End Date Filter */}
+    <Grid item xs={12} md={2}>
+      <TextField
+        fullWidth
+        label="End Date"
+        type="date"
+        InputLabelProps={{ shrink: true }}
+        value={filters.end_date}
+        onChange={(e) => handleFilterChange("end_date", e.target.value)}
+        sx={neumorphismStyles.input}
+      />
+    </Grid>
+  </Grid>
+)}
+
 
       {loading ? (
         <LoadingSpinner />
@@ -268,14 +299,16 @@ const AdminLeave = () => {
       {/* Modal for Add/Edit */}
       <Dialog open={open} onClose={handleClose} fullWidth>
         <DialogTitle>{editMode ? 'Edit Leave Record' : 'Add Leave Record'}</DialogTitle>
-        <DialogContent>
+        <DialogContent sx={neumorphismStyles.container}>
           <Box component="form" noValidate onSubmit={handleSubmit(handleAddLeaveRecord)} sx={{ mt: 2 }}>
             <Controller
+            sx={neumorphismStyles.input}
               name="employee"
               control={control}
               rules={{ required: 'Employee is required' }}
               render={({ field, fieldState }) => (
                 <AsyncSelect
+                sx={neumorphismStyles.input}
                   {...field}
                   cacheOptions
                   loadOptions={fetchEmployees}
@@ -283,25 +316,29 @@ const AdminLeave = () => {
                   placeholder="Search Employee by Name or Regimental No"
                   styles={{ menu: (base) => ({ ...base, zIndex: 9999 }) }}
                   value={
-                    editMode && selectedRecord
-                      ? {
-                        label: `${selectedRecord?.employee.name} (${selectedRecord?.employee.regimentalNo})`,
-                        value: selectedRecord?.employee._id,
-                      }
-                      : null
+                    watch("employee")
+                      ? watch("employee")
+                      : editMode && selectedRecord
+                        ? {
+                          label: `${selectedRecord?.employee.name} (${selectedRecord?.employee.regimentalNo})`,
+                          value: selectedRecord?.employee._id,
+                        }
+                        : null
                   }
+                  onChange={(selected) => field.onChange(selected)} // Ensure onChange updates form state
                 />
               )}
             />
+
             <Controller
               name="leaveType"
               control={control}
               rules={{ required: 'Leave Type is required' }}
               render={({ field, fieldState }) => (
-                <FormControl fullWidth margin="normal" error={!!fieldState.error}>
+                <FormControl sx={neumorphismStyles.input} fullWidth margin="normal" error={!!fieldState.error}>
                   <InputLabel>Leave Type</InputLabel>
                   <Select {...field}>
-                    <MenuItem value="EL">EL</MenuItem>
+                    <MenuItem  value="EL">EL</MenuItem>
                     <MenuItem value="CL">CL</MenuItem>
                     <MenuItem value="SL">SL</MenuItem>
                   </Select>
@@ -309,45 +346,12 @@ const AdminLeave = () => {
                 </FormControl>
               )}
             />
-            <Controller
-              name="startDate"
-              control={control}
-              rules={{ required: 'Start Date is required' }}
-              render={({ field, fieldState }) => (
-                <TextField
-                  {...field}
-                  label="Start Date"
-                  fullWidth
-                  margin="normal"
-                  type="date"
-                  InputLabelProps={{ shrink: true }}
-                  error={!!fieldState.error}
-                  helperText={fieldState.error?.message}
-                />
-              )}
-            />
-            <Controller
-              name="endDate"
-              control={control}
-              rules={{ required: 'End Date is required' }}
-              render={({ field, fieldState }) => (
-                <TextField
-                  {...field}
-                  label="End Date"
-                  fullWidth
-                  margin="normal"
-                  type="date"
-                  InputLabelProps={{ shrink: true }}
-                  error={!!fieldState.error}
-                  helperText={fieldState.error?.message}
-                />
-              )}
-            />
+
             <Controller
               name="reason"
               control={control}
               render={({ field }) => (
-                <TextField {...field} label="Reason" fullWidth margin="normal" />
+                <TextField sx={neumorphismStyles.input} {...field} label="Reason" fullWidth margin="normal" />
               )}
             />
             <Controller
@@ -355,7 +359,7 @@ const AdminLeave = () => {
               control={control}
               rules={{ required: 'Status is required' }}
               render={({ field, fieldState }) => (
-                <FormControl fullWidth margin="normal" error={!!fieldState.error}>
+                <FormControl sx={neumorphismStyles.input} fullWidth margin="normal" error={!!fieldState.error}>
                   <InputLabel>Status</InputLabel>
                   <Select {...field}>
                     <MenuItem value="pending">Pending</MenuItem>
@@ -366,6 +370,74 @@ const AdminLeave = () => {
                 </FormControl>
               )}
             />
+
+            <Controller
+              name="startDate"
+              control={control}
+              rules={{ required: 'Start Date is required' }}
+              render={({ field, fieldState }) => (
+                <TextField
+                sx={neumorphismStyles.input}
+                  {...field}
+                  label="Start Date"
+                  fullWidth
+                  margin="normal"
+                  type="date"
+                  InputLabelProps={{ shrink: true }}
+                  error={!!fieldState.error}
+                  helperText={fieldState.error?.message}
+                  onChange={(e) => {
+                    field.onChange(e.target.value);
+                    const newStartDate = new Date(e.target.value);
+                    const days = watch("noOfDays") || 0;
+                    if (days > 0) {
+                      const calculatedEndDate = new Date(newStartDate);
+                      calculatedEndDate.setDate(calculatedEndDate.getDate() + parseInt(days));
+                      setValue("endDate", calculatedEndDate.toISOString().split("T")[0]); // Updates the End Date
+                    }
+                  }}
+                />
+              )}
+            />
+
+            <Controller
+              name="noOfDays"
+              control={control}
+              rules={{ required: 'Number of Days is required', min: 1 }}
+              render={({ field, fieldState }) => (
+                <TextField
+                sx={neumorphismStyles.input}
+                  {...field}
+                  label="No. of Days"
+                  fullWidth
+                  margin="normal"
+                  type="number"
+                  InputLabelProps={{ shrink: true }}
+                  error={!!fieldState.error}
+                  helperText={fieldState.error?.message}
+                  onChange={(e) => {
+                    field.onChange(e.target.value);
+                    const days = parseInt(e.target.value, 10);
+                    const startDate = watch("startDate");
+                    if (startDate && days > 0) {
+                      const calculatedEndDate = new Date(startDate);
+                      calculatedEndDate.setDate(calculatedEndDate.getDate() + days);
+                      setValue("endDate", calculatedEndDate.toISOString().split("T")[0]); // Updates the End Date
+                    }
+                  }}
+                />
+              )}
+            />
+
+            {/* Auto-filled End Date */}
+            <FormControl fullWidth margin="normal">
+              <FormLabel sx={{ mb: 1, fontWeight: 'bold' }}>End Date</FormLabel>
+              <Box sx={{ ...neumorphismStyles.input, p: 2, borderRadius: 2, textAlign: 'center' }}>
+                <Typography variant="body1">
+                  {watch("endDate") ? formatDate(new Date(watch("endDate")), "dd MMM yyyy") : "--"}
+                </Typography>
+              </Box>
+            </FormControl>
             <DialogActions>
               <Button sx={neumorphismStyles.button} onClick={handleClose} color="secondary">
                 Cancel

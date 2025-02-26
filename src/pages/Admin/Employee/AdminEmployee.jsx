@@ -6,9 +6,12 @@ import {
   Paper,
   TextField,
   MenuItem,
+  Tooltip,
+  IconButton,
 } from "@mui/material";
 import axios from "../../../services/api";
 import EmployeeList from "./components/EmployeeList";
+import TuneIcon from '@mui/icons-material/Tune';
 import Sidebar from "../../../components/shared/Sidebar";
 import { neumorphismStyles } from "./Style";
 import LoadingSpinner from "../../../components/shared/LoadingSpinner";
@@ -30,6 +33,7 @@ const AdminEmployee = () => {
   const [error, setError] = useState("");
   const [formData, setFormData] = useState(initialFormData);
   const [openDialog, setOpenDialog] = useState(false);
+  const [openFilter, setOpenFilter] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
 
   // Filters
@@ -104,14 +108,19 @@ const AdminEmployee = () => {
     <div>
       <Sidebar role={"admin"} />
       <Grid container sx={neumorphismStyles.container}>
-        <Grid item xs={12}>
-          <Typography variant="h4" sx={neumorphismStyles.typography}>
+        <Grid item xs={12} sx={{ mb: 1 }}>
+          <Typography variant="h4" sx={{mb: 1, ...neumorphismStyles.typography}}>
             Employees
+            <Tooltip title="Filters">
+              <IconButton size="small" sx={{ ml: 1, ...neumorphismStyles.button }} color={openFilter ? 'success' : ''} onClick={() => setOpenFilter(prev => !prev)}>
+                <TuneIcon />
+              </IconButton>
+            </Tooltip>
           </Typography>
         </Grid>
 
         {/* Filters */}
-        <Grid container spacing={2} sx={{ marginBottom: 2 }}>
+        {openFilter && (<Grid container spacing={2} sx={{ marginBottom: 2 }}>
           <Grid item xs={12} md={2.5}>
             <TextField
               select
@@ -173,7 +182,7 @@ const AdminEmployee = () => {
               ))}
             </TextField>
           </Grid>
-        </Grid>
+        </Grid>)}
 
         {/* Employee List */}
         <Grid item xs={12}>

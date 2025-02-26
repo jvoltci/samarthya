@@ -21,6 +21,7 @@ import {
   FormControl,
   InputLabel,
   Select,
+  FormLabel,
 } from '@mui/material';
 import { Add, Edit, Delete, Visibility } from '@mui/icons-material';
 import { useForm, Controller } from 'react-hook-form';
@@ -41,7 +42,7 @@ const AdminProfileLeave = ({ employeeId }) => {
   const [editMode, setEditMode] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [expandedRow, setExpandedRow] = useState(null);
-  const { handleSubmit, control, reset, setValue } = useForm();
+  const { handleSubmit, control, reset, watch, setValue } = useForm();
   const { user } = useAuth();
 
   const theme = useTheme();
@@ -73,7 +74,6 @@ const AdminProfileLeave = ({ employeeId }) => {
   const handleAddLeaveRecord = async (formData) => {
     try {
       const payload = { ...formData, employee: employeeId };
-      console.log(payload)
       if (editMode) {
         await axios.put(`/leave/${selectedRecord._id}`, payload);
       } else {
@@ -151,7 +151,7 @@ const AdminProfileLeave = ({ employeeId }) => {
                         color="primary"
                         onClick={() => toggleRowExpansion(record._id)}
                       >
-                         <Visibility />
+                        <Visibility />
                       </IconButton>
 
                     </TableCell>
@@ -196,11 +196,12 @@ const AdminProfileLeave = ({ employeeId }) => {
         </TableContainer>
       )}
 
-
       <Dialog open={open} onClose={handleClose} fullWidth>
         <DialogTitle>{editMode ? 'Edit Leave Record' : 'Add Leave Record'}</DialogTitle>
         <DialogContent sx={neumorphismStyles.paper}>
           <Box component="form" noValidate onSubmit={handleSubmit(handleAddLeaveRecord)} sx={{ mt: 2 }}>
+
+            {/* Leave Type */}
             <Controller
               name="leaveType"
               control={control}
@@ -216,12 +217,78 @@ const AdminProfileLeave = ({ employeeId }) => {
                 </FormControl>
               )}
             />
-            <Controller name="startDate" control={control} render={({ field }) => (
-              <TextField sx={neumorphismStyles.input} {...field} label="Start Date" fullWidth margin="normal" type="date" InputLabelProps={{ shrink: true }} />
-            )} />
-            <Controller name="endDate" control={control} render={({ field }) => (
-              <TextField sx={neumorphismStyles.input} {...field} label="End Date" fullWidth margin="normal" type="date" InputLabelProps={{ shrink: true }} />
-            )} />
+
+            {/* Start Date */}
+            <Controller
+              name="startDate"
+              control={control}
+              rules={{ required: 'Start Date is required' }}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  label={watch("startDate") ? formatDate(new Date(watch("startDate")), "dd MMM yyyy") : "Start Date"}
+                  fullWidth
+                  margin="normal"
+                  type="date"
+                  InputLabelProps={{ shrink: true }}
+                  sx={neumorphismStyles.input}
+                  onChange={(e) => {
+                    field.onChange(e);
+                    const startDate = new Date(e.target.value);
+                    if (watch("noOfDays")) {
+                      const calculatedEndDate = new Date(startDate);
+                      calculatedEndDate.setDate(calculatedEndDate.getDate() + Number(watch("noOfDays")) - 1);
+                      setValue("endDate", calculatedEndDate.toISOString().split("T")[0]);
+                    }
+                  }}
+                />
+              )}
+            />
+
+            {/* No. of Days */}
+            <Controller
+              name="noOfDays"
+              control={control}
+              rules={{ required: 'No. of days is required', min: 1 }}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  label="No. of Days"
+                  fullWidth
+                  margin="normal"
+                  type="number"
+                  InputLabelProps={{ shrink: true }}
+                  sx={neumorphismStyles.input}
+                  onChange={(e) => {
+                    field.onChange(e);
+                    const startDate = new Date(watch("startDate"));
+                    if (startDate && e.target.value) {
+                      const calculatedEndDate = new Date(startDate);
+                      calculatedEndDate.setDate(calculatedEndDate.getDate() + Number(e.target.value) - 1);
+                      setValue("endDate", calculatedEndDate.toISOString().split("T")[0]);
+                    }
+                  }}
+                />
+              )}
+            />
+
+            {/* Auto-filled End Date */}
+            <FormControl fullWidth margin="normal">
+              <FormLabel sx={{ mb: 1, fontWeight: 'bold' }}>End Date</FormLabel>
+              <Controller
+                name="endDate"
+                control={control}
+                render={({ field }) => (
+                  <Box sx={{ ...neumorphismStyles.input, p: 2, borderRadius: 2, backgroundColor: '#f0f0f0', textAlign: 'center' }}>
+                    <Typography variant="body1">
+                      {watch("endDate") ? formatDate(new Date(watch("endDate")), "dd MMM yyyy") : "--"}
+                    </Typography>
+                  </Box>
+                )}
+              />
+            </FormControl>
+
+
             <DialogActions>
               <Button onClick={handleClose} variant={'outlined'} sx={neumorphismStyles.button}>Cancel</Button>
               <Button type="submit" color="secondary" variant={'outlined'} sx={neumorphismStyles.button}>Save</Button>
@@ -229,6 +296,7 @@ const AdminProfileLeave = ({ employeeId }) => {
           </Box>
         </DialogContent>
       </Dialog>
+
     </Box>
   );
 };

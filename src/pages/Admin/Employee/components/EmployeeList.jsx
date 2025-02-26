@@ -15,6 +15,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { useNavigate } from 'react-router-dom';
+import { neumorphismStyles } from '../Style';
 
 const EmployeeList = ({ employees, onEdit, onDelete }) => {
   const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false);
@@ -59,7 +60,7 @@ const EmployeeList = ({ employees, onEdit, onDelete }) => {
             />
             <div>
               <Tooltip title="View Details">
-                <IconButton onClick={() => handleViewProfile(employee._id)}>
+                <IconButton sx={neumorphismStyles.button} color='secondary' onClick={() => handleViewProfile(employee._id)}>
                   <VisibilityIcon />
                 </IconButton>
               </Tooltip>

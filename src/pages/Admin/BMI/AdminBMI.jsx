@@ -16,13 +16,14 @@ import {
   DialogActions,
   TextField,
   IconButton,
+  Tooltip,
 } from "@mui/material";
-import { Add, Edit, Delete, Visibility } from "@mui/icons-material";
+import { Add, Edit, Delete, Visibility, Search } from "@mui/icons-material";
 import axios from "../../../services/api";
 import { useForm, Controller } from "react-hook-form";
 import AsyncSelect from "react-select/async";
 import { useMediaQuery, useTheme } from "@mui/material";
-import { styled } from '@mui/system';
+import TuneIcon from '@mui/icons-material/Tune';
 import LoadingSpinner from "../../../components/shared/LoadingSpinner";
 import { neumorphismStyles } from "../Employee/Style";
 import { ResponsiveTable } from "../../../components/shared/ResponsiveTable";
@@ -37,6 +38,8 @@ const AdminBMI = () => {
   const [expandedRow, setExpandedRow] = useState(null); // To track the expanded row
   const { handleSubmit, control, reset, watch, setValue } = useForm();
   const theme = useTheme();
+  const [openFilter, setOpenFilter] = useState(false);
+  const [bmiFilter, setBmiFilter] = useState('');
   const isLargeScreen = useMediaQuery(theme.breakpoints.up("lg")); // Check if screen is large
 
   // Fetch BMI Records
@@ -47,14 +50,14 @@ const AdminBMI = () => {
   const fetchBMIRecords = async () => {
     setLoading(true);
     try {
-      const { data } = await axios.get("/bmi");
-      setBmiRecords(data);
+      const response = await axios.get(`/bmi?bmi=${bmiFilter}`);
+      setBmiRecords(response.data);
     } catch (error) {
-      console.error("Failed to fetch BMI records:", error);
-    } finally {
-      setLoading(false);
+      console.error("Error fetching BMI records:", error);
     }
+    setLoading(false);
   };
+
 
   // Fetch Employees for Dropdown
   const fetchEmployees = async (search = "") => {
@@ -139,11 +142,41 @@ const AdminBMI = () => {
   return (
     <Box sx={neumorphismStyles.container2}>
       <Grid container justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
-        <Typography variant="h4">BMI</Typography>
+        <Typography variant="h4">BMI
+          <Tooltip title="Filters">
+            <IconButton size="small" sx={{ ml: 1, ...neumorphismStyles.button }} color={openFilter ? 'success' : ''} onClick={() => setOpenFilter(prev => !prev)}>
+              <TuneIcon />
+            </IconButton>
+          </Tooltip>
+        </Typography>
         <Button sx={neumorphismStyles.button2} variant='outlined' color="primary" startIcon={<Add />} onClick={() => handleOpen()}>
           Add BMI
         </Button>
       </Grid>
+
+      {/* Filters */}
+      {openFilter && (<Grid container spacing={2} sx={{ mb: 2 }}>
+
+        <Grid item xs={6} md={2}>
+          <TextField
+            label="BMI (Greater Than)"
+            type="number"
+            value={bmiFilter}
+            onChange={(e) => setBmiFilter(e.target.value)}
+            sx={{ mb: 2, width: 250, ...neumorphismStyles.input }}
+            InputProps={{
+              endAdornment: (
+                <IconButton onClick={() => fetchBMIRecords()} color="primary">
+                  <Search />
+                </IconButton>
+              ),
+            }}
+          />
+        </Grid>
+      </Grid>)}
+
+
+
 
       {loading ? (
         <LoadingSpinner />
@@ -153,10 +186,10 @@ const AdminBMI = () => {
             <TableHead>
               <TableRow>
                 <TableCell sx={neumorphismStyles.cell} >Employee</TableCell>
-                {isLargeScreen &&<TableCell sx={neumorphismStyles.cell} >Weight (kg)</TableCell>}
-                {isLargeScreen &&<TableCell sx={neumorphismStyles.cell} >Height (cm)</TableCell>}
+                {isLargeScreen && <TableCell sx={neumorphismStyles.cell} >Weight (kg)</TableCell>}
+                {isLargeScreen && <TableCell sx={neumorphismStyles.cell} >Height (cm)</TableCell>}
                 <TableCell sx={neumorphismStyles.cell} >BMI</TableCell>
-                <TableCell sx={neumorphismStyles.cell}  align="right">Actions</TableCell>
+                <TableCell sx={neumorphismStyles.cell} align="right">Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -165,10 +198,10 @@ const AdminBMI = () => {
                   {/* Main Row */}
                   <TableRow>
                     <TableCell sx={neumorphismStyles.cell} >{`${record.employee?.name} (${record.employee?.regimentalNo})`}</TableCell>
-                    {isLargeScreen &&<TableCell sx={neumorphismStyles.cell} >{record.weight}</TableCell>}
-                    {isLargeScreen &&<TableCell sx={neumorphismStyles.cell} >{record.height}</TableCell>}
+                    {isLargeScreen && <TableCell sx={neumorphismStyles.cell} >{record.weight}</TableCell>}
+                    {isLargeScreen && <TableCell sx={neumorphismStyles.cell} >{record.height}</TableCell>}
                     <TableCell sx={neumorphismStyles.cell} >{record.bmi}</TableCell>
-                    <TableCell sx={neumorphismStyles.cell}  align="right">
+                    <TableCell sx={neumorphismStyles.cell} align="right">
                       <IconButton sx={neumorphismStyles.button} color="primary" onClick={() => toggleRowExpansion(record._id)}>
                         <Visibility />
                       </IconButton>
@@ -178,7 +211,7 @@ const AdminBMI = () => {
                   {/* Expanded Row */}
                   {expandedRow === record._id && (
                     <TableRow>
-                      <TableCell sx={neumorphismStyles.cell}  colSpan={isLargeScreen ? 6 : 4}>
+                      <TableCell sx={neumorphismStyles.cell} colSpan={isLargeScreen ? 6 : 4}>
                         <Box sx={{ p: 2 }}>
                           <Typography variant="body2">
                             <strong>Employee Details:</strong> {record.employee?.name} ({record.employee?.regimentalNo})
@@ -239,9 +272,9 @@ const AdminBMI = () => {
                   value={
                     editMode && selectedRecord
                       ? {
-                          label: `${selectedRecord?.employee.name} (${selectedRecord?.employee.regimentalNo})`,
-                          value: selectedRecord?.employee._id,
-                        }
+                        label: `${selectedRecord?.employee.name} (${selectedRecord?.employee.regimentalNo})`,
+                        value: selectedRecord?.employee._id,
+                      }
                       : null
                   }
                 />
