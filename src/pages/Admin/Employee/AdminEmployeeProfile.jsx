@@ -127,14 +127,14 @@ const AdminEmployeeProfile = () => {
                 onChange={(e) => setEmployee({ ...employee, rank: e.target.value })}
                 disabled={!editing}
               >
-                <MenuItem value="Junior">CT</MenuItem>
-                <MenuItem value="Senior">M/CT</MenuItem>
-                <MenuItem value="Junior">HC</MenuItem>
-                <MenuItem value="Junior">INSP</MenuItem>
-                <MenuItem value="Junior">HC/RO</MenuItem>
-                <MenuItem value="Junior">{'SI(RO)'}</MenuItem>
-                <MenuItem value="Junior">{'SI(JE)'}</MenuItem>
-                <MenuItem value="Junior">Cook</MenuItem>
+                <MenuItem value="CT">CT</MenuItem>
+                <MenuItem value="M/CT">M/CT</MenuItem>
+                <MenuItem value="HC">HC</MenuItem>
+                <MenuItem value="INSP">INSP</MenuItem>
+                <MenuItem value="HC/RO">HC/RO</MenuItem>
+                <MenuItem value="SI(RO)">{'SI(RO)'}</MenuItem>
+                <MenuItem value="SI(JE)">{'SI(JE)'}</MenuItem>
+                <MenuItem value="Cook">Cook</MenuItem>
               </Select>
             </FormControl>
             <TextField
